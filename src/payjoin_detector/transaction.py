@@ -4,7 +4,6 @@ Creating an adapter for any API should result in these types
 """
 
 from dataclasses import dataclass
-from typing import Optional
 
 
 @dataclass
@@ -20,12 +19,12 @@ class PrevOut:
 class TxInput:
     txid: str
     vout: int
-    prevout: PrevOut
-    scriptsig: str
-    scriptsig_asm: str
-    witness: list[str]
+    scriptsig: str | None
+    scriptsig_asm: str | None
+    witness: list[str] | None
     is_coinbase: bool
     sequence: int
+    prevout: PrevOut | None
 
 
 @dataclass
@@ -40,9 +39,9 @@ class TxOutput:
 @dataclass
 class TxStatus:
     confirmed: bool
-    block_height: int
-    block_hash: str
-    block_time: int
+    block_height: int | None
+    block_hash: str | None
+    block_time: int | None
 
 
 @dataclass
@@ -56,11 +55,4 @@ class Transaction:
     weight: int
     fee: int
     status: TxStatus
-    sigops: Optional[int] = None
-
-
-@dataclass
-class DetectionResult:
-    txid: str
-    confidence: float
-    signals: list[str]
+    sigops: int | None

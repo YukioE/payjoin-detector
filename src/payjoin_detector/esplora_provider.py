@@ -6,14 +6,14 @@ import urllib.request
 import urllib.error
 import json
 
-from payjoin_detector.models import (
+from payjoin_detector.transaction import (
     Transaction,
     TxInput,
     TxOutput,
     TxStatus,
     PrevOut
 )
-from payjoin_detector.providers.base import (
+from payjoin_detector.provider import (
     TransactionProvider,
     TransactionNotFoundError,
     ProviderError,
@@ -99,8 +99,9 @@ class EsploraProvider(TransactionProvider):
             locktime=raw.get("locktime", 0),
             inputs=inputs,
             outputs=outputs,
-            size=raw.get("size"),
-            weight=raw.get("weight"),
-            fee=raw.get("fee"),
+            size=raw.get("size", 0),
+            weight=raw.get("weight", 0),
+            fee=raw.get("fee", 0),
+            sigops=raw.get("sigops", 0),
             status=status
         )

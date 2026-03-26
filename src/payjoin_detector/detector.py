@@ -19,7 +19,7 @@ class DetectionResult:
 
 DEFAULT_HEURISTICS: list[Heuristic] = [
     UnnecessaryInputHeuristic(),
-    MixedInputTypesHeuristic()
+    MixedInputTypesHeuristic(),
 ]
 
 
@@ -71,7 +71,10 @@ class Detector:
             return DetectionResult(
                 txid=tx.txid,
                 confidence=0.0,
-                heuristics=["PayJoin not possible", "either Coinbase tx or <2 distinct input addresses"]
+                heuristics=[
+                    "PayJoin not possible",
+                    "either Coinbase tx or <2 distinct input addresses",
+                ],
             )
 
         results = [h.check(tx) for h in self.heuristics]
@@ -80,11 +83,11 @@ class Detector:
         total_weight = sum(weights[r.name] for r in results)
         weighted_score = sum(r.score * weights[r.name] for r in results)
 
-        raw        = (weighted_score / total_weight) if total_weight > 0 else 0.0
+        raw = (weighted_score / total_weight) if total_weight > 0 else 0.0
         confidence = round(max(0.0, min(1.0, raw)), 4)
 
         heuristic_strings = [
-                f"{'[+]' if r.score > 0 else '[-]' if r.score < 0 else '[•]'} {r.name}: {r.signal}"
+            f"{'[+]' if r.score > 0 else '[-]' if r.score < 0 else '[•]'} {r.name}: {r.signal}"
             for r in results
             if r.signal
         ]

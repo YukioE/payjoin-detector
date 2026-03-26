@@ -13,17 +13,22 @@ class MixedInputTypesHeuristic(Heuristic):
     - Mixed inputs after 09-2024 or unconfirmed tx give neutral score (0)
     - Uniform inputs give neutral score (0)
     """
+
     name = "Mixed input types heuristic"
     weight = 1.0
 
     def check(self, tx: Transaction) -> HeuristicResult:
-        input_types = {inp.prevout.scriptpubkey_type for inp in tx.inputs if inp.prevout is not None}
+        input_types = {
+            inp.prevout.scriptpubkey_type
+            for inp in tx.inputs
+            if inp.prevout is not None
+        }
 
         if not input_types:
             return HeuristicResult(
                 name=self.name,
                 score=0.0,
-                signal="no prevout data to determine input types"
+                signal="no prevout data to determine input types",
             )
 
         tx_time = tx.status.block_time
@@ -33,17 +38,17 @@ class MixedInputTypesHeuristic(Heuristic):
                 return HeuristicResult(
                     name=self.name,
                     score=-1.0,
-                    signal=f"mixed input types before Sep 2024 - {input_types}"
+                    signal=f"mixed input types before Sep 2024 - {input_types}",
                 )
             else:
                 return HeuristicResult(
                     name=self.name,
                     score=0.3,
-                    signal=f"mixed input types - {input_types}"
+                    signal=f"mixed input types - {input_types}",
                 )
 
         return HeuristicResult(
             name=self.name,
             score=0.0,
-            signal=f"all inputs same type - {input_types.pop()}"
+            signal=f"all inputs same type - {input_types.pop()}",
         )

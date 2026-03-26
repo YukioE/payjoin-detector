@@ -1,6 +1,7 @@
 from payjoin_detector.transaction import Transaction
 from payjoin_detector.heuristic import Heuristic, HeuristicResult
 
+
 class UnnecessaryInputHeuristic(Heuristic):
     """
     UIH2: if the smallest output is larger than the smallest input,
@@ -9,6 +10,7 @@ class UnnecessaryInputHeuristic(Heuristic):
 
     Score: 0.8 if triggered, else 0.0
     """
+
     name = "Unnecessary input heuristic"
     weight = 1.2
 
@@ -17,9 +19,7 @@ class UnnecessaryInputHeuristic(Heuristic):
         for i in tx.inputs:
             if i.prevout is None:
                 return HeuristicResult(
-                    name=self.name,
-                    score=0.0,
-                    signal="missing prevout data"
+                    name=self.name, score=0.0, signal="missing prevout data"
                 )
             input_values.append(i.prevout.value)
 
@@ -29,8 +29,7 @@ class UnnecessaryInputHeuristic(Heuristic):
             return HeuristicResult(
                 name=self.name,
                 score=0.0,
-                signal="either input or output values missing"
-
+                signal="either input or output values missing",
             )
 
         min_input = min(input_values)
@@ -42,4 +41,8 @@ class UnnecessaryInputHeuristic(Heuristic):
                 score=0.8,
                 signal=f"UIH2 smallest output ({min_output} sat) > smallest input ({min_input} sat)",
             )
-        return HeuristicResult(name=self.name, score=0.0, signal=f"UIH1 optimal change detected, smallest output ({min_output} sat) < smallest input ({min_input} sat)")
+        return HeuristicResult(
+            name=self.name,
+            score=0.0,
+            signal=f"UIH1 optimal change detected, smallest output ({min_output} sat) < smallest input ({min_input} sat)",
+        )

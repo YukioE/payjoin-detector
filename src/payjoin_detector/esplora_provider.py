@@ -11,7 +11,7 @@ from payjoin_detector.transaction import (
     TxInput,
     TxOutput,
     TxStatus,
-    PrevOut
+    PrevOut,
 )
 from payjoin_detector.provider import (
     TransactionProvider,
@@ -68,7 +68,7 @@ class EsploraProvider(TransactionProvider):
                     witness=vin.get("witness", []),
                     is_coinbase=vin.get("is_coinbase", False),
                     sequence=vin.get("sequence", 0xFFFFFFFF),
-                    prevout=PrevOut(**prev) if prev else None
+                    prevout=PrevOut(**prev) if prev else None,
                 ),
             )
 
@@ -103,5 +103,5 @@ class EsploraProvider(TransactionProvider):
             weight=raw.get("weight", 0),
             fee=raw.get("fee", 0),
             sigops=raw.get("sigops", 0),
-            status=status
+            status=status,
         )

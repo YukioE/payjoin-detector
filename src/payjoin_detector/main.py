@@ -10,6 +10,7 @@ from payjoin_detector.detector import Detector
 from payjoin_detector.esplora_provider import EsploraProvider
 from payjoin_detector.provider import TransactionNotFoundError, ProviderError
 
+
 def main():
     if len(sys.argv) < 2:
         print("Usage: python main.py <txhash>", file=sys.stderr)

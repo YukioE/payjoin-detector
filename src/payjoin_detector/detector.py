@@ -2,8 +2,9 @@
 Detector — uses provider + heuristics to return a DetectionResult.
 """
 
-from payjoin_detector.heuristics.UnnecessaryInput import UnnecessaryInputHeuristic
-from payjoin_detector.heuristics.MixedInputTypes import MixedInputTypesHeuristic
+from payjoin_detector.heuristics.roundOutput import RoundOutputHeuristic
+from payjoin_detector.heuristics.unnecessaryInput import UnnecessaryInputHeuristic
+from payjoin_detector.heuristics.mixedInputTypes import MixedInputTypesHeuristic
 from payjoin_detector.heuristic import Heuristic
 from payjoin_detector.provider import TransactionProvider
 from payjoin_detector.transaction import Transaction
@@ -20,6 +21,7 @@ class DetectionResult:
 DEFAULT_HEURISTICS: list[Heuristic] = [
     UnnecessaryInputHeuristic(),
     MixedInputTypesHeuristic(),
+    RoundOutputHeuristic(),
 ]
 
 

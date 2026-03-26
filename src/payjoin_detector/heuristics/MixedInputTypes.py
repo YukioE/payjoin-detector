@@ -9,9 +9,9 @@ class MixedInputTypesHeuristic(Heuristic):
     """
     ITCH: checks whether all inputs are of the same script type.
 
-    - Mixed inputs before 09-2024 are a strong signal against payjoin (-1)
-    - Mixed inputs after 09-2024 or unconfirmed tx give neutral score (0)
-    - Uniform inputs give neutral score (0)
+    - Mixed inputs before 09-2024 are a strong signal against payjoin
+    - Mixed inputs after 09-2024 are a weak signal for payjoin
+    - Uniform inputs give neutral score
     """
 
     name = "Mixed input types heuristic"

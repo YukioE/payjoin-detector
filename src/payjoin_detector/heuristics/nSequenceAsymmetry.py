@@ -25,11 +25,11 @@ class NSequenceAsymmetryHeuristic(Heuristic):
             return HeuristicResult(
                 name=self.name,
                 score=0.5,
-                signal=f"asymmetric nSequence values detected: {seq_values}",
+                signal=f"asymmetric nSequence values detected - {seq_values}",
             )
         else:
             return HeuristicResult(
                 name=self.name,
                 score=0.0,
-                signal=f"all inputs have same nSequence: {seq_values.pop()}",
+                signal=f"all inputs have same nSequence - {seq_values.pop()}",
             )

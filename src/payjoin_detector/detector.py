@@ -3,6 +3,7 @@ Detector — uses provider + heuristics to return a DetectionResult.
 """
 
 from payjoin_detector.heuristics.coinJoin import CoinJoinHeuristic
+from payjoin_detector.heuristics.nSequenceAsymmetry import NSequenceAsymmetryHeuristic
 from payjoin_detector.heuristics.roundOutput import RoundOutputHeuristic
 from payjoin_detector.heuristics.unnecessaryInput import UnnecessaryInputHeuristic
 from payjoin_detector.heuristics.mixedInputTypes import MixedInputTypesHeuristic
@@ -24,6 +25,7 @@ DEFAULT_HEURISTICS: list[Heuristic] = [
     MixedInputTypesHeuristic(),
     RoundOutputHeuristic(),
     CoinJoinHeuristic(),
+    NSequenceAsymmetryHeuristic(),
 ]
 
 

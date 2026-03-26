@@ -2,7 +2,8 @@
 Detector — uses provider + heuristics to return a DetectionResult.
 """
 
-from payjoin_detector.checks import DEFAULT_HEURISTICS
+from payjoin_detector.heuristics.UnnecessaryInput import UnnecessaryInputHeuristic
+from payjoin_detector.heuristics.MixedInputTypes import MixedInputTypesHeuristic
 from payjoin_detector.heuristic import Heuristic
 from payjoin_detector.provider import TransactionProvider
 from payjoin_detector.transaction import Transaction
@@ -14,6 +15,12 @@ class DetectionResult:
     txid: str
     confidence: float
     heuristics: list[str]
+
+
+DEFAULT_HEURISTICS: list[Heuristic] = [
+    UnnecessaryInputHeuristic(),
+    MixedInputTypesHeuristic()
+]
 
 
 class Detector:
@@ -73,12 +80,11 @@ class Detector:
         total_weight = sum(weights[r.name] for r in results)
         weighted_score = sum(r.score * weights[r.name] for r in results)
 
-        confidence = (weighted_score /
-                      total_weight) if total_weight > 0 else 0.0
-        confidence = round(min(1.0, confidence), 2)
+        raw        = (weighted_score / total_weight) if total_weight > 0 else 0.0
+        confidence = round(max(0.0, min(1.0, raw)), 4)
 
         heuristic_strings = [
-                f"{'[+]' if r.score > 0 else '[-]' if r.score < 0 else '[~]'} {r.name}: {r.signal}"
+                f"{'[+]' if r.score > 0 else '[-]' if r.score < 0 else '[•]'} {r.name}: {r.signal}"
             for r in results
             if r.signal
         ]

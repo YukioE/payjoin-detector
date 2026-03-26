@@ -17,7 +17,7 @@ def main():
 
     txhash = sys.argv[1]
 
-    # change provider here is using a different API
+    # change provider here if using a different API
     provider = EsploraProvider()
     detector = Detector(provider=provider)
 

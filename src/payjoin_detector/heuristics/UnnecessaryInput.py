@@ -1,10 +1,5 @@
-"""
-payjoin heuristics
-"""
-
 from payjoin_detector.transaction import Transaction
 from payjoin_detector.heuristic import Heuristic, HeuristicResult
-
 
 class UnnecessaryInputHeuristic(Heuristic):
     """
@@ -48,8 +43,3 @@ class UnnecessaryInputHeuristic(Heuristic):
                 signal=f"UIH2 smallest output ({min_output} sat) > smallest input ({min_input} sat)",
             )
         return HeuristicResult(name=self.name, score=0.0, signal=f"UIH1 optimal change detected, smallest output ({min_output} sat) < smallest input ({min_input} sat)")
-
-
-DEFAULT_HEURISTICS: list[Heuristic] = [
-    UnnecessaryInputHeuristic(),
-]

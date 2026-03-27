@@ -3,7 +3,7 @@ from payjoin_detector.detector import BlockDetectionResult, TxDetectionResult
 
 def print_single_result(result: TxDetectionResult) -> None:
     print(f"\nTX         : {result.txid}")
-    print(f"Inp/Out    : {result.input_count} / {result.output_count}")
+    print(f"I / O      : {result.input_count} / {result.output_count}")
     print(f"Confidence : {result.confidence:.2%}")
     for s in result.heuristics:
         print(f"  {s}")
@@ -28,8 +28,6 @@ def print_block_result(block: BlockDetectionResult) -> None:
         return
 
     filtered.sort(key=lambda r: r.confidence, reverse=True)
-
-    print(f"\nResults ({len(filtered)} txs):\n")
 
     for result in filtered:
         print_single_result(result)

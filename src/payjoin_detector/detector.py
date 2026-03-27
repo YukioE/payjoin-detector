@@ -79,8 +79,14 @@ class Detector:
             if vin.prevout and vin.prevout.scriptpubkey_address
         }
 
+        distinct_output_addrs = {
+            vout.scriptpubkey_address
+            for vout in tx.outputs
+            if vout.scriptpubkey_address
+        }
+
         # tx must have at least 2 distinct addresses (sender & receiver)
-        if len(distinct_input_addrs) < 2:
+        if len(distinct_input_addrs) < 2 or len(distinct_output_addrs) < 2:
             return False
 
         return True
@@ -97,7 +103,8 @@ class Detector:
                 confidence=0.0,
                 heuristics=[
                     "PayJoin not possible",
-                    "either Coinbase tx or <2 distinct input addresses",
+                    "either Coinbase tx or <2 distinct addresses",
+                    "on either input or output side",
                 ],
             )
 

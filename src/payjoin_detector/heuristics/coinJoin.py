@@ -1,5 +1,5 @@
-from payjoin_detector.transaction import Transaction
-from payjoin_detector.heuristic import Heuristic, HeuristicResult
+from payjoin_detector.core.transaction import Transaction
+from payjoin_detector.core.heuristic import Heuristic, HeuristicResult
 
 
 class CoinJoinHeuristic(Heuristic):

@@ -1,6 +1,6 @@
 from datetime import datetime
-from payjoin_detector.transaction import Transaction
-from payjoin_detector.heuristic import Heuristic, HeuristicResult
+from payjoin_detector.core.transaction import Transaction
+from payjoin_detector.core.heuristic import Heuristic, HeuristicResult
 
 SEPT_2024 = int(datetime(2024, 9, 1).timestamp())
 

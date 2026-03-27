@@ -1,5 +1,5 @@
-from payjoin_detector.transaction import Transaction
-from payjoin_detector.heuristic import Heuristic, HeuristicResult
+from payjoin_detector.core.transaction import Transaction
+from payjoin_detector.core.heuristic import Heuristic, HeuristicResult
 
 
 class RoundOutputHeuristic(Heuristic):
@@ -20,7 +20,7 @@ class RoundOutputHeuristic(Heuristic):
                 name=self.name, score=0.0, signal="no outputs to analyze"
             )
 
-        round_threshold = 1000
+        round_threshold = 100
         is_round = [o.value % round_threshold == 0 for o in tx.outputs]
 
         if all(is_round):

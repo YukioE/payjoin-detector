@@ -5,7 +5,7 @@ Heuristic base class
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 
-from payjoin_detector.transaction import Transaction
+from payjoin_detector.core.transaction import Transaction
 
 
 @dataclass

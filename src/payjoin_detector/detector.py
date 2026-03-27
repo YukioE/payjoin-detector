@@ -2,6 +2,7 @@
 Detector — uses provider + heuristics to return a DetectionResult.
 """
 
+from payjoin_detector.core.detection import BlockDetectionResult, TxDetectionResult
 from payjoin_detector.heuristics.coinJoin import CoinJoinHeuristic
 from payjoin_detector.heuristics.nSequenceAsymmetry import NSequenceAsymmetryHeuristic
 from payjoin_detector.heuristics.roundOutput import RoundOutputHeuristic
@@ -11,28 +12,9 @@ from payjoin_detector.heuristics.roundPaymentAssignment import (
 )
 from payjoin_detector.heuristics.unnecessaryInput import UnnecessaryInputHeuristic
 from payjoin_detector.heuristics.mixedInputTypes import MixedInputTypesHeuristic
-from payjoin_detector.heuristic import Heuristic
-from payjoin_detector.provider import TransactionProvider
-from payjoin_detector.transaction import Transaction
-from dataclasses import dataclass
-
-
-@dataclass
-class TxDetectionResult:
-    txid: str
-    input_count: int
-    output_count: int
-    confidence: float
-    heuristics: list[str]
-
-
-@dataclass
-class BlockDetectionResult:
-    blockhash: str
-    total_txs: int
-    above_threshold: int
-    threshold: float
-    results: list[TxDetectionResult]
+from payjoin_detector.core.heuristic import Heuristic
+from payjoin_detector.core.provider import TransactionProvider
+from payjoin_detector.core.transaction import Transaction
 
 
 DEFAULT_HEURISTICS: list[Heuristic] = [

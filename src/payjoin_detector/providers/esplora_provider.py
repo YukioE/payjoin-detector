@@ -6,14 +6,14 @@ import urllib.request
 import urllib.error
 import json
 
-from payjoin_detector.transaction import (
+from payjoin_detector.core.transaction import (
     Transaction,
     TxInput,
     TxOutput,
     TxStatus,
     PrevOut,
 )
-from payjoin_detector.provider import (
+from payjoin_detector.core.provider import (
     TransactionProvider,
     TransactionNotFoundError,
     BlockNotFoundError,

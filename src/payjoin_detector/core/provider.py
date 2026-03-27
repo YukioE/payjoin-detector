@@ -3,7 +3,7 @@ Abstract base class for transaction providers.
 """
 
 from abc import ABC, abstractmethod
-from payjoin_detector.transaction import Transaction
+from payjoin_detector.core.transaction import Transaction
 
 
 class TransactionProvider(ABC):

@@ -6,73 +6,9 @@ Usage:
 """
 
 import argparse
-from payjoin_detector.detector import BlockDetectionResult, Detector, TxDetectionResult
-from payjoin_detector.esplora_provider import EsploraProvider
-from payjoin_detector.provider import (
-    BlockNotFoundError,
-    ProviderError,
-    TransactionNotFoundError,
-)
-
-
-def _print_single_result(result: TxDetectionResult) -> None:
-    print(f"\nTX         : {result.txid}")
-    print(f"Inp/Out    : {result.input_count} / {result.output_count}")
-    print(f"Confidence : {result.confidence:.2%}")
-    for s in result.heuristics:
-        print(f"  {s}")
-    print()
-
-
-def _print_block_result(block: BlockDetectionResult) -> None:
-    print(f"\nBlock      : {block.blockhash}")
-    print("-" * 60)
-    print(f"Total txs       : {block.total_txs}")
-    print(
-        f"Above threshold : {block.above_threshold} "
-        f"({(block.above_threshold / block.total_txs * 100) if block.total_txs else 0:.1f}%) "
-        f"[>= {block.threshold:.0%}]"
-    )
-    print("-" * 60)
-
-    filtered = [r for r in block.results if r.confidence >= block.threshold]
-
-    if not filtered:
-        print("\nNo transactions met the threshold.\n")
-        return
-
-    filtered.sort(key=lambda r: r.confidence, reverse=True)
-
-    print(f"\nResults ({len(filtered)} txs):\n")
-
-    for result in filtered:
-        _print_single_result(result)
-
-
-def cmd_tx(args, detector: Detector) -> None:
-    try:
-        result = detector.detect(args.txid)
-    except TransactionNotFoundError:
-        print(f"Error: transaction {args.txid!r} not found.")
-        return
-    except ProviderError as e:
-        print(f"Error fetching transaction: {e}")
-        return
-
-    _print_single_result(result)
-
-
-def cmd_block(args, detector: Detector) -> None:
-    try:
-        block_result = detector.detect_block(args.blockhash)
-    except BlockNotFoundError:
-        print(f"Error: block {args.blockhash!r} not found.")
-        return
-    except ProviderError as e:
-        print(f"Error fetching block: {e}")
-        return
-
-    _print_block_result(block_result)
+from payjoin_detector.cli.commands import cmd_block, cmd_tx
+from payjoin_detector.detector import Detector
+from payjoin_detector.providers.esplora_provider import EsploraProvider
 
 
 def build_parser() -> argparse.ArgumentParser:

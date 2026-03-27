@@ -16,8 +16,10 @@ from dataclasses import dataclass
 
 
 @dataclass
-class DetectionResult:
+class TxDetectionResult:
     txid: str
+    input_count: int
+    output_count: int
     confidence: float
     heuristics: list[str]
 
@@ -51,8 +53,8 @@ class Detector:
         self.provider = provider
         self.heuristics = heuristics if heuristics is not None else DEFAULT_HEURISTICS
 
-    def detect(self, txid: str) -> DetectionResult:
-        """Fetch tx and run all heuristics, return a DetectionResult."""
+    def detect(self, txid: str) -> TxDetectionResult:
+        """Fetch tx and run all heuristics, return a TxDetectionResult"""
         tx = self.provider.get_transaction(txid)
         return self.analyse(tx)
 
@@ -73,13 +75,15 @@ class Detector:
 
         return True
 
-    def analyse(self, tx: Transaction) -> DetectionResult:
+    def analyse(self, tx: Transaction) -> TxDetectionResult:
         """
         Run heuristics on an already-fetched Transaction.
         """
         if not self.check_payjoin_possible(tx):
-            return DetectionResult(
+            return TxDetectionResult(
                 txid=tx.txid,
+                input_count=len(tx.inputs),
+                output_count=len(tx.outputs),
                 confidence=0.0,
                 heuristics=[
                     "PayJoin not possible",
@@ -97,13 +101,15 @@ class Detector:
         confidence = round(max(0.0, min(1.0, raw)), 4)
 
         heuristic_strings = [
-            f"{'[+]' if r.score > 0 else '[-]' if r.score < 0 else '[•]'} {r.name}: {r.signal}"
+            f"{'[+]' if r.score > 0 else '[-]' if r.score < 0 else '[ ]'} {r.name}: {r.signal}"
             for r in results
             if r.signal
         ]
 
-        return DetectionResult(
+        return TxDetectionResult(
             txid=tx.txid,
+            input_count=len(tx.inputs),
+            output_count=len(tx.outputs),
             confidence=confidence,
             heuristics=heuristic_strings,
         )

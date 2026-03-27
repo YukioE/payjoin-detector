@@ -32,6 +32,7 @@ def main():
         sys.exit(2)
 
     print(f"\nTX         : {result.txid}")
+    print(f"Inp/Out    : {result.input_count} / {result.output_count}")
     print(f"Confidence : {result.confidence:.2%}")
     for s in result.heuristics:
         print(f"  {s}")

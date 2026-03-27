@@ -6,7 +6,9 @@ from payjoin_detector.heuristics.coinJoin import CoinJoinHeuristic
 from payjoin_detector.heuristics.nSequenceAsymmetry import NSequenceAsymmetryHeuristic
 from payjoin_detector.heuristics.roundOutput import RoundOutputHeuristic
 from payjoin_detector.heuristics.signatureAsymmetry import SignatureAsymmetryHeuristic
-from payjoin_detector.heuristics.testh import RoundPaymentAssignmentHeuristic
+from payjoin_detector.heuristics.roundPaymentAssignment import (
+    RoundPaymentAssignmentHeuristic,
+)
 from payjoin_detector.heuristics.unnecessaryInput import UnnecessaryInputHeuristic
 from payjoin_detector.heuristics.mixedInputTypes import MixedInputTypesHeuristic
 from payjoin_detector.heuristic import Heuristic
@@ -22,6 +24,15 @@ class TxDetectionResult:
     output_count: int
     confidence: float
     heuristics: list[str]
+
+
+@dataclass
+class BlockDetectionResult:
+    blockhash: str
+    total_txs: int
+    above_threshold: int
+    threshold: float
+    results: list[TxDetectionResult]
 
 
 DEFAULT_HEURISTICS: list[Heuristic] = [
@@ -57,6 +68,23 @@ class Detector:
         """Fetch tx and run all heuristics, return a TxDetectionResult"""
         tx = self.provider.get_transaction(txid)
         return self.analyse(tx)
+
+    def detect_block(
+        self, block_hash: str, threshold: float = 0.1
+    ) -> BlockDetectionResult:
+        """Fetch all tx inside specified block and analyze each, return a BlockDetectionResult"""
+        transactions = self.provider.get_transactions(block_hash)
+        results = [self.analyse(tx) for tx in transactions]
+
+        above = [r for r in results if r.confidence >= threshold]
+
+        return BlockDetectionResult(
+            blockhash=block_hash,
+            total_txs=len(results),
+            above_threshold=len(above),
+            threshold=threshold,
+            results=results,
+        )
 
     def check_payjoin_possible(self, tx: Transaction) -> bool:
         # Coinbase transactions can never be PayJoin

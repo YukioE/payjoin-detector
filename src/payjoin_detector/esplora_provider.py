@@ -16,6 +16,7 @@ from payjoin_detector.transaction import (
 from payjoin_detector.provider import (
     TransactionProvider,
     TransactionNotFoundError,
+    BlockNotFoundError,
     ProviderError,
 )
 
@@ -39,6 +40,35 @@ class EsploraProvider(TransactionProvider):
     def get_transaction(self, txid: str) -> Transaction:
         raw = self._fetch_json(f"{self.base_url}/tx/{txid}")
         return self._parse(raw)
+
+    def get_transactions(self, block_hash: str) -> list[Transaction]:
+        txids = self._fetch_block_txids(block_hash)
+
+        transactions: list[Transaction] = []
+        for txid in txids:
+            raw = self._fetch_json(f"{self.base_url}/tx/{txid}")
+            transactions.append(self._parse(raw))
+
+        return transactions
+
+    def _fetch_block_txids(self, block_hash: str) -> list[str]:
+        """Return the ordered list of txids for *block_hash*."""
+        url = f"{self.base_url}/block/{block_hash}/txids"
+        try:
+            req = urllib.request.Request(
+                url,
+                headers={"User-Agent": "payjoin-detector/1.0"},
+            )
+            with urllib.request.urlopen(req, timeout=self.timeout) as resp:
+                return json.loads(resp.read())
+        except urllib.error.HTTPError as e:
+            if e.code == 404:
+                raise BlockNotFoundError(f"block not found: {block_hash}") from e
+            raise ProviderError(
+                f"HTTP {e.code} fetching txids for block {block_hash}"
+            ) from e
+        except Exception as e:
+            raise ProviderError(f"Request failed: {e}") from e
 
     def _fetch_json(self, url: str) -> dict:
         try:

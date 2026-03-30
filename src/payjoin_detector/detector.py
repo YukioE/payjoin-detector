@@ -10,6 +10,7 @@ from payjoin_detector.heuristics.signatureAsymmetry import SignatureAsymmetryHeu
 from payjoin_detector.heuristics.roundPaymentAssignment import (
     RoundPaymentAssignmentHeuristic,
 )
+from payjoin_detector.heuristics.smallIOCounts import SmallIOCountsHeuristic
 from payjoin_detector.heuristics.unnecessaryInput import UnnecessaryInputHeuristic
 from payjoin_detector.heuristics.mixedInputTypes import MixedInputTypesHeuristic
 from payjoin_detector.core.heuristic import Heuristic
@@ -25,6 +26,7 @@ DEFAULT_HEURISTICS: list[Heuristic] = [
     NSequenceAsymmetryHeuristic(),
     SignatureAsymmetryHeuristic(),
     RoundPaymentAssignmentHeuristic(),
+    SmallIOCountsHeuristic(),
 ]
 
 

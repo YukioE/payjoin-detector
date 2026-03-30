@@ -31,6 +31,10 @@ class RoundPaymentAssignmentHeuristic(Heuristic):
                 payment = abs(o_val - i_val)
                 if payment % 100 == 0 and payment != 0:
                     round_matches.append((i_val, o_val, payment))
+                    if len(round_matches) >= 5:
+                        break
+            if len(round_matches) >= 5:
+                break
 
         if round_matches:
             return HeuristicResult(

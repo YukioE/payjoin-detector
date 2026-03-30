@@ -66,18 +66,20 @@ class SignatureAsymmetryHeuristic(Heuristic):
                 except Exception:
                     continue
 
+        r_types_string = dict(list(input_r_types.items())[:5])
+
         if len(r_types) > 1:
             return HeuristicResult(
                 name=self.name,
                 score=0.8,
-                signal=f"signature asymmetry detected - {input_r_types}",
+                signal=f"signature asymmetry detected - {r_types_string}",
             )
         else:
             return HeuristicResult(
                 name=self.name,
                 score=0.0,
                 signal=(
-                    f"all signatures consistent - {input_r_types}"
+                    f"all signatures consistent - {r_types_string}"
                     if input_r_types
                     else "no signature data"
                 ),

@@ -6,49 +6,79 @@ class SignatureAsymmetryHeuristic(Heuristic):
     """
     SAH: Detects asymmetric ECDSA signatures across inputs.
 
-    - If some signatures are low-R and some are high-R, signal for PayJoin
-    - If all signatures have the same R-type, neutral
+    - Only signals when all inputs are the same type
+    - If some signatures are high-R and some low-R, positive score
+    - If inputs are mixed types, neutral
     """
 
     name = "Signature asymmetry heuristic"
     weight = 1.0
 
     def check(self, tx: Transaction) -> HeuristicResult:
-        r_types = set()
+        # Gather input types
+        input_types = {
+            inp.prevout.scriptpubkey_type for inp in tx.inputs if inp.prevout
+        }
 
-        for inp in tx.inputs:
-            if not inp.witness or len(inp.witness) < 1:
-                continue
-
-            sig_bytes = (
-                bytes.fromhex(inp.witness[0])
-                if isinstance(inp.witness[0], str)
-                else inp.witness[0]
+        # If input types are not uniform, signature asymmetry is expected; return neutral
+        if len(input_types) > 1:
+            return HeuristicResult(
+                name=self.name,
+                score=0.0,
+                signal=f"mixed input types ({input_types}) - asymmetry expected",
             )
 
-            if len(sig_bytes) < 3:
+        # Check signature R-types
+        input_r_types = {}
+        r_types = set()
+
+        for idx, inp in enumerate(tx.inputs):
+            if not inp.witness:
                 continue
 
-            # DER-encoded signature: first byte 0x30, second = length, then r & s
-            # R starts at byte 3 (DER header = 0x30 len, 0x02 len_r)
-            r_len = sig_bytes[3]
-            r_value = sig_bytes[4 : 4 + r_len]
+            for item in inp.witness:
+                sig_bytes = bytes.fromhex(item) if isinstance(item, str) else item
 
-            # Check if R needs leading zero pad (high-R) or not (low-R)
-            high_r = r_value[0] == 0x00
-            r_types.add("high" if high_r else "low")
+                if len(sig_bytes) < 3:
+                    continue
+
+                # Remove sighash byte
+                sig_der = sig_bytes[:-1]
+
+                if len(sig_der) < 4 or sig_der[0] != 0x30:
+                    continue
+
+                try:
+                    r_len = sig_der[3]
+                    r_value = sig_der[4 : 4 + r_len]
+
+                    if not r_value:
+                        continue
+
+                    high_r = r_value[0] == 0x00
+                    r_type = "high-R" if high_r else "low-R"
+
+                    input_r_types[idx] = r_type
+                    r_types.add(r_type)
+
+                    break
+
+                except Exception:
+                    continue
 
         if len(r_types) > 1:
             return HeuristicResult(
                 name=self.name,
                 score=0.8,
-                signal=f"signature asymmetry detected - {r_types}",
+                signal=f"signature asymmetry detected - {input_r_types}",
             )
         else:
             return HeuristicResult(
                 name=self.name,
                 score=0.0,
-                signal=f"all signatures consistent - {r_types.pop()}"
-                if r_types
-                else "no signature data",
+                signal=(
+                    f"all signatures consistent - {input_r_types}"
+                    if input_r_types
+                    else "no signature data"
+                ),
             )

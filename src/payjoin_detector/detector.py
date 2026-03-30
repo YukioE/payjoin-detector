@@ -4,6 +4,7 @@ Detector — uses provider + heuristics to return a DetectionResult.
 
 from payjoin_detector.core.detection import BlockDetectionResult, TxDetectionResult
 from payjoin_detector.heuristics.coinJoin import CoinJoinHeuristic
+from payjoin_detector.heuristics.mixedOutputTypes import MixedOutputTypesHeuristic
 from payjoin_detector.heuristics.nSequenceAsymmetry import NSequenceAsymmetryHeuristic
 from payjoin_detector.heuristics.roundOutput import RoundOutputHeuristic
 from payjoin_detector.heuristics.signatureAsymmetry import SignatureAsymmetryHeuristic
@@ -20,13 +21,14 @@ from payjoin_detector.core.transaction import Transaction
 
 DEFAULT_HEURISTICS: list[Heuristic] = [
     UnnecessaryInputHeuristic(),
+    SmallIOCountsHeuristic(),
     MixedInputTypesHeuristic(),
+    MixedOutputTypesHeuristic(),
     RoundOutputHeuristic(),
+    RoundPaymentAssignmentHeuristic(),
     CoinJoinHeuristic(),
     NSequenceAsymmetryHeuristic(),
     SignatureAsymmetryHeuristic(),
-    RoundPaymentAssignmentHeuristic(),
-    SmallIOCountsHeuristic(),
 ]
 
 
@@ -106,7 +108,7 @@ class Detector:
                 heuristics=[
                     "PayJoin not possible",
                     "either Coinbase tx or <2 distinct addresses",
-                    "on either input or output side",
+                    "on input or output side",
                 ],
             )
 

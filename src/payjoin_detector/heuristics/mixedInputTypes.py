@@ -7,7 +7,7 @@ SEPT_2024 = int(datetime(2024, 9, 1).timestamp())
 
 class MixedInputTypesHeuristic(Heuristic):
     """
-    ITCH: checks whether all inputs are of the same script type.
+    MITH: checks whether all inputs are of the same script type.
 
     - Mixed inputs before 09-2024 are a strong signal against payjoin (-1)
     - Mixed inputs after 09-2024 are a weak signal for payjoin
@@ -43,12 +43,12 @@ class MixedInputTypesHeuristic(Heuristic):
             else:
                 return HeuristicResult(
                     name=self.name,
-                    score=0.3,
+                    score=0.6,
                     signal=f"mixed input types - {input_types}",
                 )
 
         return HeuristicResult(
             name=self.name,
-            score=0.0,
+            score=0.3,
             signal=f"all inputs same type - {input_types.pop()}",
         )

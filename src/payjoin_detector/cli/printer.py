@@ -2,7 +2,9 @@ from payjoin_detector.detector import BlockDetectionResult, TxDetectionResult
 
 
 def print_single_result(result: TxDetectionResult) -> None:
-    print(f"\nTX         : {result.txid}")
+    txString = f"https://mempool.space/tx/{result.txid}?mode=details"
+
+    print(f"\nTX         : {txString}")
     print(f"I / O      : {result.input_count} / {result.output_count}")
     print(f"Confidence : {result.confidence:.2%}")
     for s in result.heuristics:
@@ -11,7 +13,9 @@ def print_single_result(result: TxDetectionResult) -> None:
 
 
 def print_block_result(block: BlockDetectionResult) -> None:
-    print(f"\nBlock      : {block.blockhash}")
+    blockString = f"https://mempool.space/block/{block.blockhash}"
+
+    print(f"\nBlock      : {blockString}")
     print("-" * 60)
     print(f"Total txs       : {block.total_txs}")
     print(

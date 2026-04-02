@@ -37,18 +37,18 @@ class MixedInputTypesHeuristic(Heuristic):
             if tx_time and tx_time < SEPT_2024:
                 return HeuristicResult(
                     name=self.name,
-                    score=-1.0,
+                    score=-2.0,
                     signal=f"mixed input types before Sep 2024 - {input_types}",
                 )
             else:
                 return HeuristicResult(
                     name=self.name,
-                    score=0.6,
+                    score=0.0,
                     signal=f"mixed input types - {input_types}",
                 )
 
         return HeuristicResult(
             name=self.name,
-            score=0.3,
+            score=0.4,
             signal=f"all inputs same type - {input_types.pop()}",
         )

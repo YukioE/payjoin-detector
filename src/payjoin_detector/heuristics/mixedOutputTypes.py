@@ -26,7 +26,7 @@ class MixedOutputTypesHeuristic(Heuristic):
         if len(output_types) > 1:
             return HeuristicResult(
                 name=self.name,
-                score=0.6,
+                score=0.0,
                 signal=f"mixed output types - {output_types}",
             )
 

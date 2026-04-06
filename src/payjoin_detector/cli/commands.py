@@ -22,7 +22,10 @@ async def cmd_tx(args, detector: Detector) -> None:
 
 async def cmd_block(args, detector: Detector) -> None:
     try:
-        block_result = await detector.detect_block(args.blockhash)
+        block_result = await detector.detect_block(
+            args.blockhash,
+            use_async=getattr(args, "use_async", False),
+        )
     except BlockNotFoundError:
         print(f"Error: block {args.blockhash!r} not found.")
         return

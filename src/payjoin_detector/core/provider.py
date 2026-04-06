@@ -21,7 +21,9 @@ class TransactionProvider(ABC):
         ...
 
     @abstractmethod
-    async def get_transactions(self, block_hash: str) -> list[Transaction]:
+    async def get_transactions(
+        self, block_hash: str, use_async: bool = False
+    ) -> list[Transaction]:
         """
         Fetch all transactions from a block_hash.
         Raises BlockNotFoundError if the block_hash is unknown.

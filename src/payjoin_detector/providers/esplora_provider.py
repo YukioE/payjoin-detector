@@ -51,16 +51,29 @@ class EsploraProvider(TransactionProvider):
         raw = await asyncio.to_thread(self._fetch_json, f"{self.base_url}/tx/{txid}")
         return self._parse(raw)
 
-    async def get_transactions(self, block_hash: str) -> list[Transaction]:
+    async def get_transactions(
+        self, block_hash: str, use_async: bool = False
+    ) -> list[Transaction]:
         txids = await asyncio.to_thread(self._fetch_block_txids, block_hash)
 
-        async def fetch_one(txid: str) -> dict:
-            async with self._sem:
-                return await asyncio.to_thread(
-                    self._fetch_json, f"{self.base_url}/tx/{txid}"
+        if use_async:
+
+            async def fetch_one(txid: str) -> dict:
+                async with self._sem:
+                    return await asyncio.to_thread(
+                        self._fetch_json, f"{self.base_url}/tx/{txid}"
+                    )
+
+            raws = await asyncio.gather(*[fetch_one(txid) for txid in txids])
+        else:
+            raws = []
+            for txid in txids:
+                raws.append(
+                    await asyncio.to_thread(
+                        self._fetch_json, f"{self.base_url}/tx/{txid}"
+                    )
                 )
 
-        raws = await asyncio.gather(*[fetch_one(txid) for txid in txids])
         return [self._parse(raw) for raw in raws]
 
     def _fetch_block_txids(self, block_hash: str) -> list[str]:

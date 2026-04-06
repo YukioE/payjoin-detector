@@ -22,6 +22,12 @@ def build_parser() -> argparse.ArgumentParser:
 
     block_parser = subparsers.add_parser("block", help="Analyze block")
     block_parser.add_argument("blockhash", help="Block hash")
+    block_parser.add_argument(
+        "--async",
+        dest="use_async",
+        action="store_true",
+        help="Fetch block transactions concurrently (faster, more connections)",
+    )
 
     return parser
 

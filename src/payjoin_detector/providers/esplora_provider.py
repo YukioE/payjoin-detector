@@ -2,6 +2,7 @@
 HTTP provider for any Esplora-compatible API.
 """
 
+import asyncio
 import urllib.request
 import urllib.error
 import json
@@ -23,33 +24,57 @@ from payjoin_detector.core.provider import (
 MEMPOOL_BASE = "https://mempool.space/api"
 BLOCKSTREAM_BASE = "https://blockstream.info/api"
 
+_MAX_CONCURRENT = 50
+
 
 class EsploraProvider(TransactionProvider):
     """
     Fetches transactions from any Esplora REST API.
 
     Args:
-        base_url: Root URL of the Esplora API, no trailing slash.
-        timeout:  HTTP request timeout in seconds.
+        base_url:       Root URL of the Esplora API, no trailing slash.
+        timeout:        HTTP request timeout in seconds.
+        max_concurrent: Max parallel requests when fetching a full block.
     """
 
-    def __init__(self, base_url: str = MEMPOOL_BASE, timeout: int = 10):
+    def __init__(
+        self,
+        base_url: str = MEMPOOL_BASE,
+        timeout: int = 10,
+        max_concurrent: int = _MAX_CONCURRENT,
+    ):
         self.base_url = base_url.rstrip("/")
         self.timeout = timeout
+        self._sem = asyncio.Semaphore(max_concurrent)
 
-    def get_transaction(self, txid: str) -> Transaction:
-        raw = self._fetch_json(f"{self.base_url}/tx/{txid}")
+    async def get_transaction(self, txid: str) -> Transaction:
+        raw = await asyncio.to_thread(self._fetch_json, f"{self.base_url}/tx/{txid}")
         return self._parse(raw)
 
-    def get_transactions(self, block_hash: str) -> list[Transaction]:
-        txids = self._fetch_block_txids(block_hash)
+    async def get_transactions(
+        self, block_hash: str, use_async: bool = False
+    ) -> list[Transaction]:
+        txids = await asyncio.to_thread(self._fetch_block_txids, block_hash)
 
-        transactions: list[Transaction] = []
-        for txid in txids:
-            raw = self._fetch_json(f"{self.base_url}/tx/{txid}")
-            transactions.append(self._parse(raw))
+        if use_async:
 
-        return transactions
+            async def fetch_one(txid: str) -> dict:
+                async with self._sem:
+                    return await asyncio.to_thread(
+                        self._fetch_json, f"{self.base_url}/tx/{txid}"
+                    )
+
+            raws = await asyncio.gather(*[fetch_one(txid) for txid in txids])
+        else:
+            raws = []
+            for txid in txids:
+                raws.append(
+                    await asyncio.to_thread(
+                        self._fetch_json, f"{self.base_url}/tx/{txid}"
+                    )
+                )
+
+        return [self._parse(raw) for raw in raws]
 
     def _fetch_block_txids(self, block_hash: str) -> list[str]:
         """Return the ordered list of txids for *block_hash*."""
@@ -115,7 +140,6 @@ class EsploraProvider(TransactionProvider):
             )
 
         s = raw.get("status", {})
-
         status = TxStatus(
             confirmed=s.get("confirmed", False),
             block_height=s.get("block_height", 0),

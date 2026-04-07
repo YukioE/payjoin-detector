@@ -52,16 +52,18 @@ class Detector:
         self.provider = provider
         self.heuristics = heuristics if heuristics is not None else DEFAULT_HEURISTICS
 
-    def detect(self, txid: str) -> TxDetectionResult:
+    async def detect(self, txid: str) -> TxDetectionResult:
         """Fetch tx and run all heuristics, return a TxDetectionResult"""
-        tx = self.provider.get_transaction(txid)
+        tx = await self.provider.get_transaction(txid)
         return self.analyse(tx)
 
-    def detect_block(
-        self, block_hash: str, threshold: float = 0.1
+    async def detect_block(
+        self, block_hash: str, threshold: float = 0.1, use_async: bool = False
     ) -> BlockDetectionResult:
         """Fetch all tx inside specified block and analyze each, return a BlockDetectionResult"""
-        transactions = self.provider.get_transactions(block_hash)
+        transactions = await self.provider.get_transactions(
+            block_hash, use_async=use_async
+        )
         results = [self.analyse(tx) for tx in transactions]
 
         above = [r for r in results if r.confidence >= threshold]

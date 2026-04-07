@@ -12,7 +12,7 @@ class TransactionProvider(ABC):
     """
 
     @abstractmethod
-    def get_transaction(self, txid: str) -> Transaction:
+    async def get_transaction(self, txid: str) -> Transaction:
         """
         Fetch a transaction by txid.
         Raises TransactionNotFoundError if the txid is unknown.
@@ -21,7 +21,9 @@ class TransactionProvider(ABC):
         ...
 
     @abstractmethod
-    def get_transactions(self, block_hash: str) -> list[Transaction]:
+    async def get_transactions(
+        self, block_hash: str, use_async: bool = False
+    ) -> list[Transaction]:
         """
         Fetch all transactions from a block_hash.
         Raises BlockNotFoundError if the block_hash is unknown.

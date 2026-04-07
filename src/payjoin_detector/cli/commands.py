@@ -7,9 +7,9 @@ from payjoin_detector.core.provider import (
 )
 
 
-def cmd_tx(args, detector: Detector) -> None:
+async def cmd_tx(args, detector: Detector) -> None:
     try:
-        result = detector.detect(args.txid)
+        result = await detector.detect(args.txid)
     except TransactionNotFoundError:
         print(f"Error: transaction {args.txid!r} not found.")
         return
@@ -20,9 +20,12 @@ def cmd_tx(args, detector: Detector) -> None:
     print_single_result(result)
 
 
-def cmd_block(args, detector: Detector) -> None:
+async def cmd_block(args, detector: Detector) -> None:
     try:
-        block_result = detector.detect_block(args.blockhash)
+        block_result = await detector.detect_block(
+            args.blockhash,
+            use_async=getattr(args, "use_async", False),
+        )
     except BlockNotFoundError:
         print(f"Error: block {args.blockhash!r} not found.")
         return

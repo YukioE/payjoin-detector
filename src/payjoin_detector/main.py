@@ -6,6 +6,7 @@ Usage:
 """
 
 import argparse
+import asyncio
 from payjoin_detector.cli.commands import cmd_block, cmd_tx
 from payjoin_detector.detector import Detector
 from payjoin_detector.providers.esplora_provider import EsploraProvider
@@ -21,11 +22,17 @@ def build_parser() -> argparse.ArgumentParser:
 
     block_parser = subparsers.add_parser("block", help="Analyze block")
     block_parser.add_argument("blockhash", help="Block hash")
+    block_parser.add_argument(
+        "--async",
+        dest="use_async",
+        action="store_true",
+        help="Fetch block transactions concurrently (faster, more connections)",
+    )
 
     return parser
 
 
-def main() -> None:
+async def async_main() -> None:
     parser = build_parser()
     args = parser.parse_args()
 
@@ -33,9 +40,13 @@ def main() -> None:
     detector = Detector(provider=provider)
 
     if args.command == "tx":
-        cmd_tx(args, detector)
+        await cmd_tx(args, detector)
     elif args.command == "block":
-        cmd_block(args, detector)
+        await cmd_block(args, detector)
+
+
+def main() -> None:
+    asyncio.run(async_main())
 
 
 if __name__ == "__main__":

@@ -7,7 +7,7 @@ from payjoin_detector.detector import Detector
 from payjoin_detector.providers.esplora_provider import EsploraProvider
 
 
-def analyse_txid(txid: str, provider: TransactionProvider | None = None) -> float:
+async def analyse_txid(txid: str, provider: TransactionProvider | None = None) -> float:
     """
     Fetch a transaction by ID and return a payjoin probability score.
 
@@ -24,10 +24,11 @@ def analyse_txid(txid: str, provider: TransactionProvider | None = None) -> floa
         ProviderError:            on any other network/provider failure.
     """
     detector = Detector(provider=provider or EsploraProvider())
-    return detector.detect(txid).confidence
+    result = await detector.detect(txid)
+    return result.confidence
 
 
-def analyse_block(
+async def analyse_block(
     block_hash: str,
     provider: TransactionProvider | None = None,
     threshold: float = 0.1,
@@ -50,7 +51,7 @@ def analyse_block(
         ProviderError:      on any other network/provider failure.
     """
     detector = Detector(provider=provider or EsploraProvider())
-    block_result = detector.detect_block(block_hash, threshold=threshold)
+    block_result = await detector.detect_block(block_hash, threshold=threshold)
     return {
         r.txid: r.confidence for r in block_result.results if r.confidence >= threshold
     }

@@ -11,7 +11,7 @@ POTENTIAL_PAYJOIN_TX = (
 )
 ONE_INPUT_TX = "eb07176fb0d82a1b1bc37409b454fdf19b75c20be1a005085f3c631680e30ed3"
 ONE_OUTPUT_TX = "8a416edc5d111b5fadbe9dac468d21f55623c9b4a261bfacac4f86a95bb65cb2"
-BLOCK_HASH = "000000000003ba27aa200b1cecaad478d2b00432346c3f1f3986da1afd33e506"
+BLOCK_HASH = "00000000d1145790a8694403d4063f323d499e655c83426834d4ce2f8dd4a2ee"
 
 
 class TestCheckPayjoinPossible(unittest.IsolatedAsyncioTestCase):
@@ -75,7 +75,9 @@ class TestDetect(unittest.IsolatedAsyncioTestCase):
 
     async def test_propagates_transaction_not_found(self):
         with self.assertRaises(TransactionNotFoundError):
-            await self.detector.detect("0")
+            await self.detector.detect(
+                "0000000000000000000000000000000000000000000000000000000000000000"
+            )
 
     async def test_propagates_provider_error(self):
         provider = EsploraProvider("")
@@ -95,7 +97,7 @@ class TestDetectBlock(unittest.IsolatedAsyncioTestCase):
         self.assertIsInstance(self.result, BlockDetectionResult)
 
     async def test_total_txs_count(self):
-        self.assertEqual(self.result.total_txs, 4)
+        self.assertEqual(self.result.total_txs, 2)
 
     async def test_blockhash_preserved(self):
         self.assertEqual(self.result.blockhash, BLOCK_HASH)

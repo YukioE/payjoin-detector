@@ -1,6 +1,5 @@
 import unittest
 
-from payjoin_detector.core import provider
 from payjoin_detector.providers.esplora_provider import EsploraProvider
 from payjoin_detector.core.transaction import (
     PrevOut,

@@ -104,7 +104,7 @@ class EsploraProvider(TransactionProvider):
             with urllib.request.urlopen(req, timeout=self.timeout) as resp:
                 return json.loads(resp.read())
         except urllib.error.HTTPError as e:
-            if e.code == 404:
+            if e.code == 404 or e.code == 400:
                 raise TransactionNotFoundError(f"txid not found: {url}")
             raise ProviderError(f"HTTP {e.code} from {url}") from e
         except Exception as e:

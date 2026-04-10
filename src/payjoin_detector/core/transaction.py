@@ -11,20 +11,20 @@ class PrevOut:
     scriptpubkey: str
     scriptpubkey_asm: str
     scriptpubkey_type: str
-    scriptpubkey_address: str
     value: int
+    scriptpubkey_address: str | None = None
 
 
 @dataclass
 class TxInput:
     txid: str
     vout: int
-    scriptsig: str | None
-    scriptsig_asm: str | None
-    witness: list[str] | None
     is_coinbase: bool
     sequence: int
-    prevout: PrevOut | None
+    prevout: PrevOut | None = None
+    scriptsig: str | None = None
+    scriptsig_asm: str | None = None
+    witness: list[str] | None = None
 
 
 @dataclass
@@ -39,9 +39,9 @@ class TxOutput:
 @dataclass
 class TxStatus:
     confirmed: bool
-    block_height: int | None
-    block_hash: str | None
-    block_time: int | None
+    block_height: int | None = None
+    block_hash: str | None = None
+    block_time: int | None = None
 
 
 @dataclass
@@ -55,4 +55,4 @@ class Transaction:
     weight: int
     fee: int
     status: TxStatus
-    sigops: int | None
+    sigops: int | None = None

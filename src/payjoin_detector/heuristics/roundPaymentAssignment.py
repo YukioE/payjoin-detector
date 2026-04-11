@@ -39,7 +39,7 @@ class RoundPaymentAssignmentHeuristic(Heuristic):
         if round_matches:
             return HeuristicResult(
                 name=self.name,
-                score=0.8,
+                score=0.5,
                 signal=f"Round payment detected - {round_matches}",
             )
 

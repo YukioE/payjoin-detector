@@ -41,7 +41,7 @@ class BitcoinCoreProvider(TransactionProvider):
         rpc_url: str = "",
         rpc_user: str = "",
         rpc_password: str = "",
-        timeout: int = 30,
+        timeout: int = 10,
     ):
         self.rpc_url = rpc_url.rstrip("/")
         self._auth = base64.b64encode(f"{rpc_user}:{rpc_password}".encode()).decode()
@@ -103,13 +103,23 @@ class BitcoinCoreProvider(TransactionProvider):
         return body["result"]
 
     def _rpc_getrawtransaction(self, txid: str) -> dict:
-        return self._call("getrawtransaction", [txid, True])
+        raw = self._call("getrawtransaction", [txid, True])
+        for vin in raw.get("vin", []):
+            if "coinbase" in vin:
+                continue
+            try:
+                prev_tx = self._call("getrawtransaction", [vin["txid"], True])
+                vin["prevout"] = prev_tx["vout"][vin["vout"]]
+            except (ProviderError, TransactionNotFoundError, KeyError, IndexError):
+                vin["prevout"] = None
+        return raw
 
     def _rpc_getblock(self, block_hash: str, verbosity: int = 1) -> dict:
         return self._call("getblock", [block_hash, verbosity])
 
     def _parse(self, raw: dict) -> Transaction:
         inputs = []
+        input_value = 0
         for vin in raw.get("vin", []):
             is_coinbase = "coinbase" in vin
             prevout = None
@@ -124,13 +134,14 @@ class BitcoinCoreProvider(TransactionProvider):
                         scriptpubkey_asm=spk.get("asm", ""),
                         scriptpubkey_type=spk.get("type", "unknown"),
                         scriptpubkey_address=(
-                            spk.get("address") or (spk.get("addresses") or [""])[0]
+                            spk.get("address") or (spk.get("addresses") or [None])[0]
                         ),
                     )
+                    input_value += prevout.value
 
             inputs.append(
                 TxInput(
-                    txid=vin.get("txid", ""),
+                    txid=vin.get("txid", 64 * "0"),
                     vout=vin.get("vout", 0),
                     scriptsig=vin.get("scriptSig", {}).get("hex", ""),
                     scriptsig_asm=vin.get("scriptSig", {}).get("asm", ""),
@@ -155,6 +166,7 @@ class BitcoinCoreProvider(TransactionProvider):
                     ),
                 )
             )
+        output_value = sum(vout.value for vout in outputs)
 
         confirmed = raw.get("confirmations", 0) > 0
         block_hash = raw.get("blockhash", "")
@@ -176,7 +188,7 @@ class BitcoinCoreProvider(TransactionProvider):
             outputs=outputs,
             size=raw.get("size", 0),
             weight=raw.get("weight", 0),
-            fee=0,
+            fee=max(input_value - output_value, 0),
             sigops=0,
             status=status,
         )

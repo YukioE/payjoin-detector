@@ -7,8 +7,10 @@ Usage:
 
 import argparse
 import asyncio
+import os
 from payjoin_detector.cli.commands import cmd_block, cmd_tx
 from payjoin_detector.detector import Detector
+from payjoin_detector.providers.btcCore_provider import BitcoinCoreProvider
 from payjoin_detector.providers.esplora_provider import EsploraProvider
 
 
@@ -36,7 +38,11 @@ async def async_main() -> None:
     parser = build_parser()
     args = parser.parse_args()
 
-    provider = EsploraProvider()
+    provider = BitcoinCoreProvider(
+        os.environ["BITCOIN_RPC_URL"],
+        os.environ["BITCOIN_RPC_USER"],
+        os.environ["BITCOIN_RPC_PASS"],
+    )
     detector = Detector(provider=provider)
 
     if args.command == "tx":

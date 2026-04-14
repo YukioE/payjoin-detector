@@ -14,6 +14,13 @@ class RoundPaymentAssignmentHeuristic(Heuristic):
     weight = 1.0
 
     def check(self, tx: Transaction) -> HeuristicResult:
+        if len(tx.inputs) != 2 or len(tx.outputs) != 2:
+            return HeuristicResult(
+                name=self.name,
+                score=0.0,
+                signal="TX does not have exactly 2 inputs and 2 outputs",
+            )
+
         inputs: list[int] = [inp.prevout.value for inp in tx.inputs if inp.prevout]
         outputs: list[int] = [out.value for out in tx.outputs]
 

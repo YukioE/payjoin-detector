@@ -24,6 +24,7 @@ async def cmd_block(args, detector: Detector) -> None:
     try:
         block_result = await detector.detect_block(
             args.blockhash,
+            threshold=getattr(args, "threshold", 0.1),
             use_async=getattr(args, "use_async", False),
         )
     except BlockNotFoundError:

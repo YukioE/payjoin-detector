@@ -12,7 +12,6 @@ class RoundOutputHeuristic(Heuristic):
     """
 
     name = "Round output heuristic"
-    weight = 1.0
 
     def check(self, tx: Transaction) -> HeuristicResult:
         if not tx.outputs:

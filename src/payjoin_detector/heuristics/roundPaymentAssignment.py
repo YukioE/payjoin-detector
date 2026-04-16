@@ -11,7 +11,6 @@ class RoundPaymentAssignmentHeuristic(Heuristic):
     """
 
     name = "Round payment assignment heuristic"
-    weight = 1.0
 
     def check(self, tx: Transaction) -> HeuristicResult:
         if len(tx.inputs) != 2 or len(tx.outputs) != 2:
@@ -46,7 +45,7 @@ class RoundPaymentAssignmentHeuristic(Heuristic):
         if round_matches:
             return HeuristicResult(
                 name=self.name,
-                score=0.5,
+                score=1.0,
                 signal=f"Round payment detected - {round_matches}",
             )
 

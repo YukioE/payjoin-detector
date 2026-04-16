@@ -117,12 +117,7 @@ class Detector:
             )
 
         results = [h.check(tx) for h in self.heuristics]
-        weights = {h.name: h.weight for h in self.heuristics}
-
-        total_weight = sum(weights[r.name] for r in results)
-        weighted_score = sum(r.score * weights[r.name] for r in results)
-
-        raw = (weighted_score / total_weight) if total_weight > 0 else 0.0
+        raw = sum(r.score for r in results) / len(results) if results else 0.0
         confidence = round(max(0.0, min(1.0, raw)), 4)
 
         heuristic_strings = [

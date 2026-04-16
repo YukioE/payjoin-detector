@@ -11,7 +11,6 @@ class CoinJoinHeuristic(Heuristic):
     """
 
     name = "CoinJoin pattern heuristic"
-    weight = 1.0
 
     def check(self, tx: Transaction) -> HeuristicResult:
         outputs = [o.value for o in tx.outputs]
@@ -29,7 +28,7 @@ class CoinJoinHeuristic(Heuristic):
         if common_outputs:
             return HeuristicResult(
                 name=self.name,
-                score=-1.0,
+                score=-3.0,
                 signal=f"CoinJoin pattern detected - {len(common_outputs)} values repeated >=3 times",
             )
 

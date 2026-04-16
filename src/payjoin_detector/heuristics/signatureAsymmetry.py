@@ -12,7 +12,6 @@ class SignatureAsymmetryHeuristic(Heuristic):
     """
 
     name = "Signature asymmetry heuristic"
-    weight = 1.0
 
     def check(self, tx: Transaction) -> HeuristicResult:
         # Gather input types
@@ -71,7 +70,7 @@ class SignatureAsymmetryHeuristic(Heuristic):
         if len(r_types) > 1:
             return HeuristicResult(
                 name=self.name,
-                score=0.8,
+                score=2.0,
                 signal=f"signature asymmetry detected - {r_types_string}",
             )
         else:

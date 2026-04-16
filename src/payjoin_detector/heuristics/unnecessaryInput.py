@@ -12,7 +12,6 @@ class UnnecessaryInputHeuristic(Heuristic):
     """
 
     name = "Unnecessary input heuristic"
-    weight = 1.2
 
     def check(self, tx: Transaction) -> HeuristicResult:
         input_values = []
@@ -38,7 +37,7 @@ class UnnecessaryInputHeuristic(Heuristic):
         if min_output > min_input:
             return HeuristicResult(
                 name=self.name,
-                score=0.8,
+                score=1.5,
                 signal=f"UIH2 smallest output ({min_output} sat) > smallest input ({min_input} sat)",
             )
         return HeuristicResult(

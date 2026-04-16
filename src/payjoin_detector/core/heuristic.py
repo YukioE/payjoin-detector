@@ -22,8 +22,6 @@ class Heuristic(ABC):
 
     name: str = "unnamed"
 
-    weight: float = 1.0
-
     @abstractmethod
     def check(self, tx: Transaction) -> HeuristicResult:
         """

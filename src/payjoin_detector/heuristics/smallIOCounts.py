@@ -10,7 +10,6 @@ class SmallIOCountsHeuristic(Heuristic):
     """
 
     name = "Small I/O counts heuristic"
-    weight = 1.0
 
     def check(self, tx: Transaction) -> HeuristicResult:
         input_count = len(tx.inputs)

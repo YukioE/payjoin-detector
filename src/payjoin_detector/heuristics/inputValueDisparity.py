@@ -10,7 +10,6 @@ class InputValueDisparityHeuristic(Heuristic):
     """
 
     name = "Input value disparity heuristic"
-    weight = 1.0
 
     def check(self, tx: Transaction) -> HeuristicResult:
         values = [inp.prevout.value for inp in tx.inputs if inp.prevout is not None]

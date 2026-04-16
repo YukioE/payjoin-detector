@@ -15,7 +15,6 @@ class MixedInputTypesHeuristic(Heuristic):
     """
 
     name = "Mixed input types heuristic"
-    weight = 1.0
 
     def check(self, tx: Transaction) -> HeuristicResult:
         input_types = {
@@ -37,7 +36,7 @@ class MixedInputTypesHeuristic(Heuristic):
             if tx_time and tx_time < SEPT_2024:
                 return HeuristicResult(
                     name=self.name,
-                    score=-2.0,
+                    score=-3.0,
                     signal=f"mixed input types before Sep 2024 - {input_types}",
                 )
             else:

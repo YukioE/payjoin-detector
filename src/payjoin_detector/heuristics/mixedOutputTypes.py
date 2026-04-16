@@ -11,7 +11,6 @@ class MixedOutputTypesHeuristic(Heuristic):
     """
 
     name = "Mixed output types heuristic"
-    weight = 1.0
 
     def check(self, tx: Transaction) -> HeuristicResult:
         output_types = {out.scriptpubkey_type for out in tx.outputs if out is not None}

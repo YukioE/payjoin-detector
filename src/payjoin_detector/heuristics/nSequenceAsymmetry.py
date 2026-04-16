@@ -11,7 +11,6 @@ class NSequenceAsymmetryHeuristic(Heuristic):
     """
 
     name = "nSequence asymmetry heuristic"
-    weight = 1.0
 
     def check(self, tx: Transaction) -> HeuristicResult:
         if not tx.inputs:
@@ -24,7 +23,7 @@ class NSequenceAsymmetryHeuristic(Heuristic):
         if len(seq_values) > 1:
             return HeuristicResult(
                 name=self.name,
-                score=0.5,
+                score=2.0,
                 signal=f"asymmetric nSequence values detected - {seq_values}",
             )
         else:

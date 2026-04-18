@@ -34,6 +34,9 @@ def _apply_config(args: argparse.Namespace, cfg: dict) -> None:
     if args.csv_output is None and "csv_file" in output:
         args.csv_output = output["csv_file"]
 
+    if args.debug_output is None and "debug_file" in output:
+        args.debug_output = output["debug_file"]
+
     # provider type
     if args.provider == "esplora" and "type" in prov:
         args.provider = prov["type"]
@@ -75,6 +78,13 @@ def _add_provider_args(p: argparse.ArgumentParser) -> None:
         default=None,
         metavar="FILE",
         help="Write txid,confidence rows to this CSV file (appends if file exists)",
+    )
+
+    p.add_argument(
+        "--debug-output",
+        default=None,
+        metavar="FILE",
+        help="Write debug logs to this file",
     )
 
     esplora_group = p.add_argument_group("Esplora options")

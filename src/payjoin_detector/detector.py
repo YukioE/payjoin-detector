@@ -2,6 +2,7 @@
 Detector — uses provider + heuristics to return a DetectionResult.
 """
 
+from payjoin_detector.cli.debug import get_logger
 from payjoin_detector.core.detection import BlockDetectionResult, TxDetectionResult
 from payjoin_detector.heuristics.coinJoin import CoinJoinHeuristic
 from payjoin_detector.heuristics.inputValueDisparity import InputValueDisparityHeuristic
@@ -54,19 +55,47 @@ class Detector:
 
     async def detect(self, txid: str) -> TxDetectionResult:
         """Fetch tx and run all heuristics, return a TxDetectionResult"""
+        get_logger().debug("detect: fetching txid=%s", txid)
         tx = await self.provider.get_transaction(txid)
-        return self.analyse(tx)
+        get_logger().debug(
+            "detect: fetched txid=%s inputs=%d outputs=%d",
+            txid,
+            len(tx.inputs),
+            len(tx.outputs),
+        )
+        result = self.analyse(tx)
+        return result
 
     async def detect_block(
         self, block_hash: str, threshold: float = 0.1, use_async: bool = False
     ) -> BlockDetectionResult:
         """Fetch all tx inside specified block and analyze each, return a BlockDetectionResult"""
+        get_logger().debug(
+            "detect_block: blockhash=%s threshold=%s use_async=%s",
+            block_hash,
+            threshold,
+            use_async,
+        )
+
         transactions = await self.provider.get_transactions(
             block_hash, use_async=use_async
         )
+        get_logger().debug(
+            "detect_block: fetched %d transactions from block=%s",
+            len(transactions),
+            block_hash,
+        )
+
         results = [self.analyse(tx) for tx in transactions]
 
         above = [r for r in results if r.confidence >= threshold]
+        get_logger().debug(
+            "detect_block: block=%s total=%d above_threshold=%d (threshold=%s)",
+            block_hash,
+            len(results),
+            len(above),
+            threshold,
+        )
 
         return BlockDetectionResult(
             blockhash=block_hash,
@@ -103,6 +132,8 @@ class Detector:
         """
         Run heuristics on an already-fetched Transaction.
         """
+        get_logger().debug("analyse: txid=%s", tx.txid)
+
         if not self.check_payjoin_possible(tx):
             return TxDetectionResult(
                 txid=tx.txid,
@@ -117,8 +148,18 @@ class Detector:
             )
 
         results = [h.check(tx) for h in self.heuristics]
+        for r in results:
+            get_logger().debug(
+                "analyse: txid=%s heuristic=%s score=%s signal=%s",
+                tx.txid,
+                r.name,
+                r.score,
+                r.signal,
+            )
+
         raw = sum(r.score for r in results) / len(results) if results else 0.0
         confidence = round(max(0.0, min(1.0, raw)), 4)
+        get_logger().debug("analyse: txid=%s confidence=%s", tx.txid, confidence)
 
         heuristic_strings = [
             f"{'[+]' if r.score > 0 else '[-]' if r.score < 0 else '[ ]'} {r.name}: {r.signal}"

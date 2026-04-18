@@ -15,3 +15,4 @@ async     = false
 
 [output]
 csv_file = "results.csv"
+debug_file = "debug.log"

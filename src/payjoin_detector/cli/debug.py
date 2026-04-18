@@ -1,4 +1,5 @@
 import logging
+import sys
 
 LOGGER_NAME = "payjoin_detector"
 
@@ -14,15 +15,20 @@ def setup_debug_logger(path: str | None) -> logging.Logger:
     logger.propagate = False
 
     if path:
+        formatter = logging.Formatter(
+            fmt="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+            datefmt="%Y-%m-%dT%H:%M:%S",
+        )
+
         fh = logging.FileHandler(path, mode="a", encoding="utf-8")
         fh.setLevel(logging.DEBUG)
-        fh.setFormatter(
-            logging.Formatter(
-                fmt="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
-                datefmt="%Y-%m-%dT%H:%M:%S",
-            )
-        )
+        fh.setFormatter(formatter)
         logger.addHandler(fh)
+
+        sh = logging.StreamHandler(sys.stdout)
+        sh.setLevel(logging.DEBUG)
+        sh.setFormatter(formatter)
+        logger.addHandler(sh)
 
     return logger
 

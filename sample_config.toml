@@ -12,3 +12,6 @@ rpc_password = "password"
 [block]
 threshold = 0.1
 async     = false
+
+[output]
+csv_file = "results.csv"

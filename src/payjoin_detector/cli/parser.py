@@ -28,6 +28,11 @@ def _apply_config(args: argparse.Namespace, cfg: dict) -> None:
     esplora = cfg.get("esplora", {})
     core = cfg.get("bitcoin_core", {})
     block = cfg.get("block", {})
+    output = cfg.get("output", {})
+
+    # csv output
+    if args.csv_output is None and "csv_file" in output:
+        args.csv_output = output["csv_file"]
 
     # provider type
     if args.provider == "esplora" and "type" in prov:
@@ -63,6 +68,13 @@ def _add_provider_args(p: argparse.ArgumentParser) -> None:
         default=None,
         metavar="FILE",
         help="Path to a TOML config file (e.g. payjoin_detector.toml)",
+    )
+
+    p.add_argument(
+        "--csv-output",
+        default=None,
+        metavar="FILE",
+        help="Write txid,confidence rows to this CSV file (appends if file exists)",
     )
 
     esplora_group = p.add_argument_group("Esplora options")

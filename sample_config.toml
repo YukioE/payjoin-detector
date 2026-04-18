@@ -1,18 +1,18 @@
 [provider]
-type = "esplora" # "esplora" | "bitcoin-core"
+type = "esplora" # "esplora" | "bitcoin-core" default: esplora
 
 [esplora]
-url = "https://mempool.space/api"
+url = "https://mempool.space/api" # default: mempool
 
 [bitcoin_core]
-rpc_url  = "http://127.0.0.1:8332"
-rpc_user = "user"
-rpc_password = "password"
+rpc_url  = "http://127.0.0.1:8332" # default: no url
+rpc_user = "user" # default: no user
+rpc_password = "password" # default: no password
 
 [block]
-threshold = 0.1
-async     = false
+threshold = 0.2 # default: 0.1
+async     = true # default: false
 
 [output]
-csv_file = "results.csv"
-debug_file = "debug.log"
+csv_file = "results.csv" # default: no csv output
+debug_file = "debug.log" # default: no debug file

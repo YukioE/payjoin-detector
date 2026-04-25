@@ -15,7 +15,11 @@ class SmallIOCountsHeuristic(Heuristic):
         input_count = len(tx.inputs)
         output_count = len(tx.outputs)
 
-        if input_count <= 5 and output_count <= 3:
+        if input_count <= 3 and output_count == 2:
+            return HeuristicResult(
+                name=self.name, score=1.0, signal=f"I/O count is {input_count}/2"
+            )
+        elif input_count <= 5 and output_count <= 3:
             return HeuristicResult(
                 name=self.name, score=0.5, signal="small I/O counts detected"
             )

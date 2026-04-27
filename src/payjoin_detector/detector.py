@@ -4,6 +4,7 @@ Detector — uses provider + heuristics to return a DetectionResult.
 
 from payjoin_detector.cli.debug import get_logger
 from payjoin_detector.core.detection import BlockDetectionResult, TxDetectionResult
+from payjoin_detector.heuristics.addressReuse import AddressReuseHeuristic
 from payjoin_detector.heuristics.coinJoin import CoinJoinHeuristic
 from payjoin_detector.heuristics.inputValueDisparity import InputValueDisparityHeuristic
 from payjoin_detector.heuristics.mixedOutputTypes import MixedOutputTypesHeuristic
@@ -26,6 +27,7 @@ DEFAULT_HEURISTICS: list[Heuristic] = [
     SmallIOCountsHeuristic(),
     MixedInputTypesHeuristic(),
     MixedOutputTypesHeuristic(),
+    AddressReuseHeuristic(),
     RoundOutputHeuristic(),
     RoundPaymentAssignmentHeuristic(),
     CoinJoinHeuristic(),

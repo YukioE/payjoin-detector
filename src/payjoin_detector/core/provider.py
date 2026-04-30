@@ -32,6 +32,12 @@ class TransactionProvider(ABC):
         """
         ...
 
+    @abstractmethod
+    async def get_outspend(self, txid: str, vout: int) -> dict:
+        """
+        Fetches all outspends from mempool endpoint
+        """
+
 
 class TransactionNotFoundError(Exception):
     pass

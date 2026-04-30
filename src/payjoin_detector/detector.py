@@ -43,6 +43,7 @@ class Detector:
 
     Args:
         provider:   Any TransactionProvider implementation.
+        analyse_all: if true, run heuristics on tx with less then i/o 2/2
         heuristics: List of Heuristic instances to run.
                     Defaults to DEFAULT_HEURISTICS.
     """
@@ -50,10 +51,12 @@ class Detector:
     def __init__(
         self,
         provider: TransactionProvider,
+        analyse_all: bool = False,
         heuristics: list[Heuristic] | None = None,
     ):
         self.provider = provider
         self.heuristics = heuristics if heuristics is not None else DEFAULT_HEURISTICS
+        self.analyse_all = analyse_all
 
     async def detect(self, txid: str) -> TxDetectionResult:
         """Fetch tx and run all heuristics, return a TxDetectionResult"""
@@ -71,7 +74,7 @@ class Detector:
     async def detect_block(
         self, block_hash: str, threshold: float = 0.1, use_async: bool = False
     ) -> BlockDetectionResult:
-        """Fetch all tx inside specified block and analyze each, return a BlockDetectionResult"""
+        """Fetch all tx inside specified block and analyse each, return a BlockDetectionResult"""
         get_logger().debug(
             "detect_block: blockhash=%s threshold=%s use_async=%s",
             block_hash,
@@ -136,7 +139,7 @@ class Detector:
         """
         get_logger().debug("analyse: txid=%s", tx.txid)
 
-        if not self.check_payjoin_possible(tx):
+        if not self.analyse_all and not self.check_payjoin_possible(tx):
             return TxDetectionResult(
                 txid=tx.txid,
                 input_count=len(tx.inputs),

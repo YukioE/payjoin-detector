@@ -159,3 +159,17 @@ class EsploraProvider(TransactionProvider):
             sigops=raw.get("sigops", 0),
             status=status,
         )
+
+    async def get_outspend(self, txid: str, vout: int) -> dict:
+        url = f"https://mempool.space/api/tx/{txid}/outspends"
+
+        def fetch():
+            with urllib.request.urlopen(url, timeout=10) as resp:
+                return json.load(resp)
+
+        outspends = await asyncio.to_thread(fetch)
+
+        if vout < 0 or vout >= len(outspends):
+            raise IndexError(f"vout {vout} out of range")
+
+        return outspends[vout]

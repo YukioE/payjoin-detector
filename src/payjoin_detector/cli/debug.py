@@ -16,7 +16,7 @@ def setup_debug_logger(path: str | None) -> logging.Logger:
 
     if path:
         formatter = logging.Formatter(
-            fmt="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+            fmt="%(asctime)s [%(levelname)s]: %(message)s",
             datefmt="%Y-%m-%dT%H:%M:%S",
         )
 

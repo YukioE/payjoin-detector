@@ -7,6 +7,7 @@ import urllib.request
 import urllib.error
 import json
 
+from payjoin_detector.cli.debug import get_logger
 from payjoin_detector.core.transaction import (
     Transaction,
     TxInput,
@@ -46,6 +47,8 @@ class EsploraProvider(TransactionProvider):
         self.base_url = base_url.rstrip("/")
         self.timeout = timeout
         self._sem = asyncio.Semaphore(max_concurrent)
+
+    supports_clustering = True
 
     async def get_transaction(self, txid: str) -> Transaction:
         raw = await asyncio.to_thread(self._fetch_json, f"{self.base_url}/tx/{txid}")
@@ -159,3 +162,86 @@ class EsploraProvider(TransactionProvider):
             sigops=raw.get("sigops", 0),
             status=status,
         )
+
+    async def get_cluster_transactions(
+        self, tx: Transaction, depth: int = 1, max_txs_per_address: int = 250
+    ) -> list[Transaction]:
+        """Fetch all transactions needed for CIOH clustering."""
+        visited_addresses: set[str] = set()
+        visited_txids: set[str] = set()
+        result_txns: list[Transaction] = []
+
+        current_frontier: set[str] = {
+            inp.prevout.scriptpubkey_address
+            for inp in tx.inputs
+            if inp.prevout and inp.prevout.scriptpubkey_address
+        }
+
+        for _ in range(depth):
+            new_addresses = current_frontier - visited_addresses
+            if not new_addresses:
+                break
+
+            visited_addresses.update(new_addresses)
+
+            # Fetch txids for all new addresses
+            new_txids: set[str] = set()
+            for addr in new_addresses:
+                txs = await asyncio.to_thread(
+                    self._get_address_txids, addr, max_txs_per_address
+                )
+                get_logger().debug(
+                    "provider: fetched transaction history for clustering of address %s, %d transactions found",
+                    addr,
+                    len(txs),
+                )
+                for txid in txs:
+                    new_txids.add(txid)
+
+            new_txids -= visited_txids
+            new_txids.discard(
+                tx.txid
+            )  # exclude target tx itself (possible payjoin cant apply CIOH)
+            visited_txids.update(new_txids)
+
+            get_logger().debug(
+                "provider: found %d transactions for clustering transaction base set",
+                len(new_txids),
+            )
+
+            # Fetch full transactions
+            next_frontier: set[str] = set()
+            for txid in new_txids:
+                try:
+                    txn = await self.get_transaction(txid)
+                    get_logger().debug("provider: fetched %s", txid)
+                    result_txns.append(txn)
+                    for inp in txn.inputs:
+                        if inp.prevout and inp.prevout.scriptpubkey_address:
+                            next_frontier.add(inp.prevout.scriptpubkey_address)
+                    for out in txn.outputs:
+                        if out.scriptpubkey_address:
+                            next_frontier.add(out.scriptpubkey_address)
+                except Exception:
+                    pass
+
+            current_frontier = next_frontier
+
+        return result_txns
+
+    def _get_address_txids(self, address: str, max_txs: int) -> list[str]:
+        txids: list[str] = []
+        last_seen: str | None = None
+        while len(txids) < max_txs:
+            url = f"{self.base_url}/address/{address}/txs/chain"
+            if last_seen:
+                url += f"/{last_seen}"
+            page = self._fetch_json(url)
+            if not page:
+                break
+            for entry in page:
+                txids.append(entry["txid"])
+            if len(page) < 25:
+                break
+            last_seen = txids[-1]
+        return txids[:max_txs]

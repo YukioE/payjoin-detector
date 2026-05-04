@@ -11,6 +11,8 @@ class TransactionProvider(ABC):
     Fetch and normalize a transaction from any source.
     """
 
+    supports_clustering: bool = False
+
     @abstractmethod
     async def get_transaction(self, txid: str) -> Transaction:
         """
@@ -31,6 +33,27 @@ class TransactionProvider(ABC):
         Raises ProviderError on network / parsing failure.
         """
         ...
+
+    async def get_cluster_transactions(
+        self, tx: Transaction, depth: int = 1, max_txs_per_address: int = 50
+    ) -> list[Transaction]:
+        """
+        Fetch all transactions needed for CIOH clustering.
+        Walks the transaction graph up to `depth` hops from each input address.
+        Raises ProviderError on network / parsing failure.
+        """
+        raise NotImplementedError(
+            f"{self.__class__.__name__} does not support clustering"
+        )
+
+    def _get_address_txids(self, address: str, max_txs: int) -> list[str]:
+        """
+        Fetch paginated transaction IDs for a given address.
+        Raises ProviderError on network / parsing failure.
+        """
+        raise NotImplementedError(
+            f"{self.__class__.__name__} does not support clustering"
+        )
 
 
 class TransactionNotFoundError(Exception):

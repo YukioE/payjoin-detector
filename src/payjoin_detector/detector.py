@@ -4,6 +4,7 @@ Detector — uses provider + heuristics to return a DetectionResult.
 
 from payjoin_detector.cli.debug import get_logger
 from payjoin_detector.core.detection import BlockDetectionResult, TxDetectionResult
+from payjoin_detector.heuristics import clustering
 from payjoin_detector.heuristics.addressReuse import AddressReuseHeuristic
 from payjoin_detector.heuristics.coinJoin import CoinJoinHeuristic
 from payjoin_detector.heuristics.inputValueDisparity import InputValueDisparityHeuristic
@@ -59,6 +60,15 @@ class Detector:
         """Fetch tx and run all heuristics, return a TxDetectionResult"""
         get_logger().debug("detect: fetching txid=%s", txid)
         tx = await self.provider.get_transaction(txid)
+
+        if self.provider.supports_clustering:
+            cluster_txs = await self.provider.get_cluster_transactions(tx, depth=1)
+            self.heuristics.append(clustering.ClusteringHeuristic(cluster_txs))
+            get_logger().debug(
+                "detect: fetched %d transactions needed for clustering",
+                len(cluster_txs),
+            )
+
         get_logger().debug(
             "detect: fetched txid=%s inputs=%d outputs=%d",
             txid,
@@ -152,16 +162,16 @@ class Detector:
         results = [h.check(tx) for h in self.heuristics]
         for r in results:
             get_logger().debug(
-                "analyse: txid=%s heuristic=%s score=%s signal=%s",
-                tx.txid,
+                "analyse: heuristic=%s score=%s signal=%s",
                 r.name,
                 r.score,
                 r.signal,
             )
 
+        # confidence calculation: sum scores and calc average, clamp to 0.0 - 1.0, rounded percentage value to 4 digits
         raw = sum(r.score for r in results) / len(results) if results else 0.0
         confidence = round(max(0.0, min(1.0, raw)), 4)
-        get_logger().debug("analyse: txid=%s confidence=%s", tx.txid, confidence)
+        get_logger().debug("analyse: confidence=%s", confidence)
 
         heuristic_strings = [
             f"{'[+]' if r.score > 0 else '[-]' if r.score < 0 else '[ ]'} {r.name}: {r.signal}"

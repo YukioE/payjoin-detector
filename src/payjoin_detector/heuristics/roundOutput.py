@@ -25,7 +25,7 @@ class RoundOutputHeuristic(Heuristic):
         if all(is_round):
             return HeuristicResult(
                 name=self.name,
-                score=-0.5,
+                score=-1.0,
                 signal=f"all outputs are round multiples of {round_threshold} sats, unlikely PayJoin",
             )
         elif all(not r for r in is_round):
@@ -37,6 +37,6 @@ class RoundOutputHeuristic(Heuristic):
         else:
             return HeuristicResult(
                 name=self.name,
-                score=-0.2,
+                score=-0.5,
                 signal="mixed round and non-round outputs",
             )

@@ -4,7 +4,8 @@ Detector — uses provider + heuristics to return a DetectionResult.
 
 from payjoin_detector.cli.debug import get_logger
 from payjoin_detector.core.detection import BlockDetectionResult, TxDetectionResult
-from payjoin_detector.heuristics import clustering
+from payjoin_detector.heuristics.clustering import ClusteringHeuristic
+from payjoin_detector.heuristics.roundFee import RoundFeeHeuristic
 from payjoin_detector.heuristics.addressReuse import AddressReuseHeuristic
 from payjoin_detector.heuristics.coinJoin import CoinJoinHeuristic
 from payjoin_detector.heuristics.inputValueDisparity import InputValueDisparityHeuristic
@@ -29,6 +30,7 @@ DEFAULT_HEURISTICS: list[Heuristic] = [
     MixedInputTypesHeuristic(),
     MixedOutputTypesHeuristic(),
     AddressReuseHeuristic(),
+    RoundFeeHeuristic(),
     RoundOutputHeuristic(),
     RoundPaymentAssignmentHeuristic(),
     CoinJoinHeuristic(),
@@ -63,7 +65,7 @@ class Detector:
 
         if self.provider.supports_clustering:
             cluster_txs = await self.provider.get_cluster_transactions(tx, depth=1)
-            self.heuristics.append(clustering.ClusteringHeuristic(cluster_txs))
+            self.heuristics.append(ClusteringHeuristic(cluster_txs))
             get_logger().debug(
                 "detect: fetched %d transactions needed for clustering",
                 len(cluster_txs),

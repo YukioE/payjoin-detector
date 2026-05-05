@@ -52,7 +52,8 @@ class EsploraProvider(TransactionProvider):
 
     async def get_transaction(self, txid: str) -> Transaction:
         raw = await asyncio.to_thread(self._fetch_json, f"{self.base_url}/tx/{txid}")
-        return self._parse(raw)
+        tx = self._parse(raw)
+        return tx
 
     async def get_transactions(
         self, block_hash: str, use_async: bool = False
@@ -105,6 +106,7 @@ class EsploraProvider(TransactionProvider):
                 headers={"User-Agent": "payjoin-detector/1.0"},
             )
             with urllib.request.urlopen(req, timeout=self.timeout) as resp:
+                get_logger().debug("provider: fetched %s", url)
                 return json.loads(resp.read())
         except urllib.error.HTTPError as e:
             if e.code == 404:
@@ -214,7 +216,6 @@ class EsploraProvider(TransactionProvider):
             for txid in new_txids:
                 try:
                     txn = await self.get_transaction(txid)
-                    get_logger().debug("provider: fetched %s", txid)
                     result_txns.append(txn)
                     for inp in txn.inputs:
                         if inp.prevout and inp.prevout.scriptpubkey_address:

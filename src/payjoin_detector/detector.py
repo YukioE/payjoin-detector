@@ -34,7 +34,6 @@ DEFAULT_HEURISTICS: list[Heuristic] = [
     RoundOutputHeuristic(),
     RoundPaymentAssignmentHeuristic(),
     CoinJoinHeuristic(),
-    InputValueDisparityHeuristic(),
     NSequenceAsymmetryHeuristic(),
     SignatureAsymmetryHeuristic(),
 ]

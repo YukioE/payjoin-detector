@@ -61,7 +61,15 @@ async def cmd_propagation(args, detector: Detector) -> None:
     except ProviderError as e:
         print(f"Error fetching transaction: {e}")
         return
-    report.print()
+    
+    html_output = getattr(args, "html_output", None)
+    if html_output:
+        html_content = report.to_html()
+        with open(html_output, "w", encoding="utf-8") as f:
+            f.write(html_content)
+        print(f"✓ HTML report saved to: {html_output}")
+    else:
+        report.print()
 
 
 def _write_csv(path: str, rows: list[tuple[str, float]]) -> None:

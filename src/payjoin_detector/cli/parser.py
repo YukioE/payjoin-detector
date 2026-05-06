@@ -121,6 +121,12 @@ def build_parser() -> argparse.ArgumentParser:
         "propagation", help="Inter-transaction propagation analysis"
     )
     prop_parser.add_argument("txid", help="Transaction ID")
+    prop_parser.add_argument(
+        "--html-output",
+        default=None,
+        metavar="FILE",
+        help="Save report as HTML file instead of printing to console",
+    )
     _add_provider_args(prop_parser)
 
     return parser

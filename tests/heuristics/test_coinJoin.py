@@ -2,6 +2,7 @@ import unittest
 
 from payjoin_detector.heuristics.coinJoin import CoinJoinHeuristic
 from payjoin_detector.providers.esplora_provider import EsploraProvider
+from tests import API
 
 COINJOIN_TX = "ccaf0fa1999ebf474d14e97d725bf39d8a8db14832287751fcaa485b1f6399aa"
 NORMAL_TX = "f6146cbe2f7f18a62934eb338ac18762da35ad1b61aacb93eee13cb16761a1c7"
@@ -9,7 +10,7 @@ NORMAL_TX = "f6146cbe2f7f18a62934eb338ac18762da35ad1b61aacb93eee13cb16761a1c7"
 
 class TestCoinJoinHeuristic(unittest.IsolatedAsyncioTestCase):
     async def asyncSetUp(self):
-        provider = EsploraProvider()
+        provider = EsploraProvider(API)
         self.heuristic = CoinJoinHeuristic()
         self.coinjoin_tx = await provider.get_transaction(COINJOIN_TX)
         self.normal_tx = await provider.get_transaction(NORMAL_TX)

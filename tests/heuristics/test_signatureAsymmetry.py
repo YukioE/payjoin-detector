@@ -2,6 +2,7 @@ import unittest
 
 from payjoin_detector.heuristics.signatureAsymmetry import SignatureAsymmetryHeuristic
 from payjoin_detector.providers.esplora_provider import EsploraProvider
+from tests import API
 
 ASYMMETRIC_SIG_TX = "8fd0b699a36de72451f4bb42aa1b127af167f15afd1dcd42bb9f454d470533b3"
 UNIFORM_SIG_TX = "cac7acd005a355684099ed650a16f1d7412e348c4b262cbd6538ddaae133d5d3"
@@ -11,7 +12,7 @@ NO_WITNESS_TX = "6762d24f8e7f9c2002f399cfea2b5423f196e6bc82924a32bc946422e387b0c
 
 class TestSignatureAsymmetryHeuristic(unittest.IsolatedAsyncioTestCase):
     async def asyncSetUp(self):
-        provider = EsploraProvider()
+        provider = EsploraProvider(API)
         self.heuristic = SignatureAsymmetryHeuristic()
         self.asymmetric = await provider.get_transaction(ASYMMETRIC_SIG_TX)
         self.uniform = await provider.get_transaction(UNIFORM_SIG_TX)

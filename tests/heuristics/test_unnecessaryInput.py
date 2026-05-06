@@ -2,6 +2,7 @@ import unittest
 
 from payjoin_detector.heuristics.unnecessaryInput import UnnecessaryInputHeuristic
 from payjoin_detector.providers.esplora_provider import EsploraProvider
+from tests import API
 
 UIH2_TX = "c09d242893a59e606ee70615f7619f687e6a9f506004db1dfe4a06aef4b16d53"
 UIH1_TX = "7120d9408a71a03c219c1cfd677a59febea61af3aa585b0022fe2d5094a87a26"
@@ -9,7 +10,7 @@ UIH1_TX = "7120d9408a71a03c219c1cfd677a59febea61af3aa585b0022fe2d5094a87a26"
 
 class TestUnnecessaryInputHeuristic(unittest.IsolatedAsyncioTestCase):
     async def asyncSetUp(self):
-        provider = EsploraProvider()
+        provider = EsploraProvider(API)
         self.heuristic = UnnecessaryInputHeuristic()
         self.uih2_tx = await provider.get_transaction(UIH2_TX)
         self.uih1_tx = await provider.get_transaction(UIH1_TX)

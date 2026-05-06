@@ -2,6 +2,7 @@ import unittest
 
 from payjoin_detector.heuristics.roundOutput import RoundOutputHeuristic
 from payjoin_detector.providers.esplora_provider import EsploraProvider
+from tests import API
 
 ALL_ROUND_OUTPUTS_TX = (
     "ca243920046b3ac028fbb4ba9e25ee3c675040e93d13180d6608a1e0e7fcc43b"
@@ -14,7 +15,7 @@ MIXED_OUTPUTS_TX = "721c167b4524d5b2860013bb44388a4224c43eec9c03bc712f78834193ca
 
 class TestRoundOutputHeuristic(unittest.IsolatedAsyncioTestCase):
     async def asyncSetUp(self):
-        provider = EsploraProvider()
+        provider = EsploraProvider(API)
         self.heuristic = RoundOutputHeuristic()
         self.all_round_tx = await provider.get_transaction(ALL_ROUND_OUTPUTS_TX)
         self.all_nonround_tx = await provider.get_transaction(ALL_NONROUND_OUTPUTS_TX)

@@ -24,14 +24,39 @@ class TransactionProvider(ABC):
         ...
 
     @abstractmethod
-    async def get_transactions(
-        self, block_hash: str, use_async: bool = False
-    ) -> list[Transaction]:
+    async def get_transactions(self, txids: list[str]) -> list[Transaction]:
+        """
+        Fetch and parse multiple transactions by txid.
+        Uses self.use_async to determine parallel fetching.
+
+        Args:
+            txids: List of transaction IDs to fetch
+
+        Returns:
+            List of Transaction objects
+
+        Raises:
+            TransactionNotFoundError if a txid is unknown.
+            ProviderError on network / parsing failure.
+        """
+        ...
+
+    @abstractmethod
+    async def get_block_transactions(self, block_hash: str) -> list[Transaction]:
         """
         Fetch all transactions from a block_hash.
-        Raises BlockNotFoundError if the block_hash is unknown.
-        Raises TransactionNotFoundError if a txid is unknown.
-        Raises ProviderError on network / parsing failure.
+        Uses self.use_async to determine parallel fetching.
+
+        Args:
+            block_hash: The block hash to fetch transactions from
+
+        Returns:
+            List of Transaction objects
+
+        Raises:
+            BlockNotFoundError if the block_hash is unknown.
+            TransactionNotFoundError if a txid is unknown.
+            ProviderError on network / parsing failure.
         """
         ...
 

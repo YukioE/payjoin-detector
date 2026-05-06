@@ -58,12 +58,17 @@ class EsploraProvider(TransactionProvider):
         tx = self._parse(raw)
         return tx
 
-    async def get_transactions(
-        self, block_hash: str, use_async: bool = False
-    ) -> list[Transaction]:
-        txids = await asyncio.to_thread(self._fetch_block_txids, block_hash)
+    async def get_transactions(self, txids: list[str]) -> list[Transaction]:
+        """
+        Fetch and parse multiple transactions by txid.
 
-        if use_async:
+        Args:
+            txids: List of transaction IDs to fetch
+
+        Returns:
+            List of Transaction objects
+        """
+        if self.use_async:
 
             async def fetch_one(txid: str) -> dict:
                 async with self._sem:
@@ -82,6 +87,11 @@ class EsploraProvider(TransactionProvider):
                 )
 
         return [self._parse(raw) for raw in raws]
+
+    async def get_block_transactions(self, block_hash: str) -> list[Transaction]:
+        """Fetch all transactions from a specific block and parse them."""
+        txids = await asyncio.to_thread(self._fetch_block_txids, block_hash)
+        return await self.get_transactions(txids)
 
     def _fetch_block_txids(self, block_hash: str) -> list[str]:
         """Return the ordered list of txids for *block_hash*."""

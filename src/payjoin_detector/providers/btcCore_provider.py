@@ -56,8 +56,38 @@ class BitcoinCoreProvider(TransactionProvider):
         return self._parse(raw)
 
     async def get_transactions(
-        self, block_hash: str, use_async: bool = False
+        self, txids: list[str]
     ) -> list[Transaction]:
+        """
+        Fetch and parse multiple transactions by txid.
+
+        Args:
+            txids: List of transaction IDs to fetch
+
+        Returns:
+            List of Transaction objects
+        """
+        transactions = []
+        for txid in txids:
+            try:
+                tx = await self.get_transaction(txid)
+                transactions.append(tx)
+            except (TransactionNotFoundError, ProviderError) as e:
+                raise e
+        return transactions
+
+    async def get_block_transactions(
+        self, block_hash: str
+    ) -> list[Transaction]:
+        """
+        Fetch all transactions from a block_hash.
+
+        Args:
+            block_hash: The block hash to fetch transactions from
+
+        Returns:
+            List of Transaction objects
+        """
         block = await asyncio.to_thread(self._rpc_getblock, block_hash, verbosity=3)
         return [self._parse(raw) for raw in block["tx"]]
 

@@ -85,6 +85,14 @@ class TransactionProvider(ABC):
             f"{self.__class__.__name__} does not support clustering"
         )
 
+    async def get_outspend(self, txid: str, vout: int) -> dict:
+        """
+        Fetches all outspend txs from a txid
+        """
+        raise NotImplementedError(
+            f"{self.__class__.__name__} does not support get outspends"
+        )
+
 
 class TransactionNotFoundError(Exception):
     pass

@@ -117,6 +117,12 @@ def build_parser() -> argparse.ArgumentParser:
     block_parser.add_argument("--threshold", type=float, default=0.1, metavar="0.0-1.0")
     _add_provider_args(block_parser)
 
+    prop_parser = subparsers.add_parser(
+        "propagation", help="Inter-transaction propagation analysis"
+    )
+    prop_parser.add_argument("txid", help="Transaction ID")
+    _add_provider_args(prop_parser)
+
     return parser
 
 

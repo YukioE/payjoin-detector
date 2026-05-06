@@ -7,6 +7,7 @@ from payjoin_detector.core.provider import (
     ProviderError,
     TransactionNotFoundError,
 )
+from payjoin_detector.propagation_detect import detect_neighbours
 
 
 async def cmd_tx(args, detector: Detector) -> None:
@@ -46,6 +47,21 @@ async def cmd_block(args, detector: Detector) -> None:
             if r.confidence >= threshold
         ]
         _write_csv(args.csv_output, rows)
+
+
+async def cmd_propagation(args, detector: Detector) -> None:
+    try:
+        report = await detect_neighbours(
+            detector,
+            args.txid,
+        )
+    except TransactionNotFoundError:
+        print(f"Error: transaction {args.txid!r} not found.")
+        return
+    except ProviderError as e:
+        print(f"Error fetching transaction: {e}")
+        return
+    report.print()
 
 
 def _write_csv(path: str, rows: list[tuple[str, float]]) -> None:

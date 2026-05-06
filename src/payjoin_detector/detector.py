@@ -66,9 +66,10 @@ class Detector:
         get_logger().debug("detect: fetching txid=%s", txid)
         tx = await self.provider.get_transaction(txid)
 
+        heuristics = self.heuristics.copy()
         if self.provider.supports_clustering:
             cluster_txs = await self.provider.get_cluster_transactions(tx, depth=1)
-            self.heuristics.append(ClusteringHeuristic(cluster_txs))
+            heuristics.append(ClusteringHeuristic(cluster_txs))
             get_logger().debug(
                 "detect: fetched %d transactions needed for clustering",
                 len(cluster_txs),
@@ -80,7 +81,7 @@ class Detector:
             len(tx.inputs),
             len(tx.outputs),
         )
-        result = self.analyse(tx)
+        result = self.analyse(tx, heuristics)
         return result
 
     async def detect_block(
@@ -142,10 +143,15 @@ class Detector:
 
         return True
 
-    def analyse(self, tx: Transaction) -> TxDetectionResult:
+    def analyse(
+        self, tx: Transaction, heuristics: list[Heuristic] | None = None
+    ) -> TxDetectionResult:
         """
         Run heuristics on an already-fetched Transaction.
         """
+        if heuristics is None:
+            heuristics = self.heuristics
+
         get_logger().debug("analyse: txid=%s", tx.txid)
 
         if not self.analyse_all and not self.check_payjoin_possible(tx):
@@ -161,7 +167,7 @@ class Detector:
                 ],
             )
 
-        results = [h.check(tx) for h in self.heuristics]
+        results = [h.check(tx) for h in heuristics]
         for r in results:
             get_logger().debug(
                 "analyse: heuristic=%s score=%s signal=%s",

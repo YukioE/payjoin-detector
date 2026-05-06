@@ -3,6 +3,7 @@
 Usage:
     python main.py tx    <txhash>
     python main.py block <blockhash>
+    python main.py propagation <txhash>
 """
 
 import asyncio

@@ -116,13 +116,6 @@ def build_parser() -> argparse.ArgumentParser:
         "propagation", help="Inter-transaction propagation analysis"
     )
     prop_parser.add_argument("txid", help="Transaction ID")
-    prop_parser.add_argument(
-        "--no-neighbours",
-        dest="analyse_neighbours",
-        action="store_false",
-        default=True,
-        help="Skip heuristic analysis of neighbour transactions",
-    )
     _add_provider_args(prop_parser)
 
     return parser

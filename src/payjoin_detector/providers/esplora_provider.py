@@ -161,7 +161,7 @@ class EsploraProvider(TransactionProvider):
         )
 
     async def get_outspend(self, txid: str, vout: int) -> dict:
-        url = f"https://mempool.space/api/tx/{txid}/outspends"
+        url = f"{self.base_url}/tx/{txid}/outspends"
 
         def fetch():
             with urllib.request.urlopen(url, timeout=10) as resp:

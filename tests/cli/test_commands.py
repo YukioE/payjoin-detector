@@ -13,8 +13,8 @@ BLOCK = "00000000d1145790a8694403d4063f323d499e655c83426834d4ce2f8dd4a2ee"
 
 
 class TestCmdTx(unittest.IsolatedAsyncioTestCase):
-    def setUp(self):
-        self.provider = EsploraProvider(API)
+    async def asyncSetUp(self):
+        self.provider = EsploraProvider(API, use_async=True)
         self.detector = Detector(self.provider)
         self.args = SimpleNamespace(txid=TX)
 
@@ -30,10 +30,9 @@ class TestCmdTx(unittest.IsolatedAsyncioTestCase):
 
 
 class TestCmdBlock(unittest.IsolatedAsyncioTestCase):
-    def setUp(self):
-        self.provider = EsploraProvider(API)
+    async def asyncSetUp(self):
+        self.provider = EsploraProvider(API, use_async=True)
         self.detector = Detector(self.provider)
-
         self.args = SimpleNamespace(blockhash=BLOCK, use_async=False)
 
     async def test_success(self):

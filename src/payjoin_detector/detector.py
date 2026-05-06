@@ -58,12 +58,13 @@ class Detector:
         self.provider = provider
         self.heuristics = heuristics if heuristics is not None else DEFAULT_HEURISTICS
 
-    async def detect(self, txid: str) -> TxDetectionResult:
+    async def detect(self, txid: str, use_async: bool = False) -> TxDetectionResult:
         """Fetch tx and run all heuristics, return a TxDetectionResult"""
         get_logger().debug("detect: fetching txid=%s", txid)
         tx = await self.provider.get_transaction(txid)
 
         if self.provider.supports_clustering:
+            self.provider.use_async = use_async
             cluster_txs = await self.provider.get_cluster_transactions(tx, depth=1)
             self.heuristics.append(ClusteringHeuristic(cluster_txs))
             get_logger().debug(
@@ -91,9 +92,8 @@ class Detector:
             use_async,
         )
 
-        transactions = await self.provider.get_transactions(
-            block_hash, use_async=use_async
-        )
+        self.provider.use_async = use_async
+        transactions = await self.provider.get_block_transactions(block_hash)
         get_logger().debug(
             "detect_block: fetched %d transactions from block=%s",
             len(transactions),

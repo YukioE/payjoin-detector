@@ -20,6 +20,7 @@ class TestGetTransaction(unittest.IsolatedAsyncioTestCase):
             os.environ["BITCOIN_RPC_URL"],
             os.environ["BITCOIN_RPC_USER"],
             os.environ["BITCOIN_RPC_PASS"],
+            use_async=True,
         )
 
     async def test_returns_transaction(self):
@@ -37,10 +38,11 @@ class TestGetTransactions(unittest.IsolatedAsyncioTestCase):
             os.environ["BITCOIN_RPC_URL"],
             os.environ["BITCOIN_RPC_USER"],
             os.environ["BITCOIN_RPC_PASS"],
+            use_async=True,
         )
 
     async def test_returns_transactions(self):
-        txs = await self.provider.get_transactions(SIMPLE_BLOCK_HASH)
+        txs = await self.provider.get_block_transactions(SIMPLE_BLOCK_HASH)
 
         self.assertIsInstance(txs, list)
         self.assertEqual(len(txs), 2)

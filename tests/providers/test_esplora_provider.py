@@ -17,7 +17,7 @@ from tests.providers.utils import (
 
 class TestGetTransaction(unittest.IsolatedAsyncioTestCase):
     def setUp(self):
-        self.provider = EsploraProvider(API)
+        self.provider = EsploraProvider(API, use_async=True)
 
     async def test_returns_transaction(self):
         tx = await self.provider.get_transaction(SIMPLE_TX.txid)
@@ -31,10 +31,10 @@ class TestGetTransaction(unittest.IsolatedAsyncioTestCase):
 
 class TestGetTransactions(unittest.IsolatedAsyncioTestCase):
     def setUp(self):
-        self.provider = EsploraProvider(API)
+        self.provider = EsploraProvider(API, use_async=True)
 
     async def test_returns_transactions(self):
-        txs = await self.provider.get_transactions(SIMPLE_BLOCK_HASH)
+        txs = await self.provider.get_block_transactions(SIMPLE_BLOCK_HASH)
 
         self.assertIsInstance(txs, list)
         self.assertEqual(len(txs), 2)
@@ -54,7 +54,7 @@ class TestGetTransactions(unittest.IsolatedAsyncioTestCase):
 
 class TestFetchBlockTxIds(unittest.TestCase):
     def setUp(self):
-        self.provider = EsploraProvider(API)
+        self.provider = EsploraProvider(API, use_async=True)
 
     def test_returns_txids(self):
         txid_list = self.provider._fetch_block_txids(SIMPLE_BLOCK_HASH)

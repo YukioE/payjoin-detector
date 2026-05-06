@@ -11,7 +11,11 @@ from payjoin_detector.core.provider import (
 
 async def cmd_tx(args, detector: Detector) -> None:
     try:
-        result = await detector.detect(args.txid)
+        use_async = getattr(args, "use_async", False)
+        result = await detector.detect(
+            args.txid, use_async=getattr(args, "use_async", False)
+        )
+        print(use_async)
     except TransactionNotFoundError:
         print(f"Error: transaction {args.txid!r} not found.")
         return

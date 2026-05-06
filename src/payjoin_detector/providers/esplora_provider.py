@@ -36,6 +36,7 @@ class EsploraProvider(TransactionProvider):
         base_url:       Root URL of the Esplora API, no trailing slash.
         timeout:        HTTP request timeout in seconds.
         max_concurrent: Max parallel requests when fetching a full block.
+        use_async:      If True, fetch transactions in parallel. Defaults to False.
     """
 
     def __init__(
@@ -43,9 +44,11 @@ class EsploraProvider(TransactionProvider):
         base_url: str = MEMPOOL_BASE,
         timeout: int = 10,
         max_concurrent: int = _MAX_CONCURRENT,
+        use_async: bool = False,
     ):
         self.base_url = base_url.rstrip("/")
         self.timeout = timeout
+        self.use_async = use_async
         self._sem = asyncio.Semaphore(max_concurrent)
 
     supports_clustering = True
@@ -166,7 +169,10 @@ class EsploraProvider(TransactionProvider):
         )
 
     async def get_cluster_transactions(
-        self, tx: Transaction, depth: int = 1, max_txs_per_address: int = 250
+        self,
+        tx: Transaction,
+        depth: int = 1,
+        max_txs_per_address: int = 250,
     ) -> list[Transaction]:
         """Fetch all transactions needed for CIOH clustering."""
         visited_addresses: set[str] = set()
@@ -211,11 +217,22 @@ class EsploraProvider(TransactionProvider):
                 len(new_txids),
             )
 
-            # Fetch full transactions
+            # Fetch full transactions, in parallel or sequentially
             next_frontier: set[str] = set()
-            for txid in new_txids:
-                try:
-                    txn = await self.get_transaction(txid)
+
+            if self.use_async:
+
+                async def fetch_one(txid: str) -> Transaction | None:
+                    async with self._sem:
+                        try:
+                            return await self.get_transaction(txid)
+                        except Exception:
+                            return None
+
+                fetched = await asyncio.gather(*[fetch_one(txid) for txid in new_txids])
+                for txn in fetched:
+                    if txn is None:
+                        continue
                     result_txns.append(txn)
                     for inp in txn.inputs:
                         if inp.prevout and inp.prevout.scriptpubkey_address:
@@ -223,8 +240,19 @@ class EsploraProvider(TransactionProvider):
                     for out in txn.outputs:
                         if out.scriptpubkey_address:
                             next_frontier.add(out.scriptpubkey_address)
-                except Exception:
-                    pass
+            else:
+                for txid in new_txids:
+                    try:
+                        txn = await self.get_transaction(txid)
+                        result_txns.append(txn)
+                        for inp in txn.inputs:
+                            if inp.prevout and inp.prevout.scriptpubkey_address:
+                                next_frontier.add(inp.prevout.scriptpubkey_address)
+                        for out in txn.outputs:
+                            if out.scriptpubkey_address:
+                                next_frontier.add(out.scriptpubkey_address)
+                    except Exception:
+                        pass
 
             current_frontier = next_frontier
 

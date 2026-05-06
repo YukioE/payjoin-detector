@@ -41,6 +41,10 @@ def _apply_config(args: argparse.Namespace, cfg: dict) -> None:
     if args.provider == "esplora" and "type" in prov:
         args.provider = prov["type"]
 
+    # async
+    if not args.use_async and "async" in prov:
+        args.use_async = prov["async"]
+
     # esplora
     if args.esplora_url is None and "url" in esplora:
         args.esplora_url = esplora["url"]
@@ -56,8 +60,6 @@ def _apply_config(args: argparse.Namespace, cfg: dict) -> None:
     # block-specific
     if hasattr(args, "threshold") and args.threshold == 0.1 and "threshold" in block:
         args.threshold = block["threshold"]
-    if hasattr(args, "use_async") and not args.use_async and "async" in block:
-        args.use_async = block["async"]
 
 
 def _add_provider_args(p: argparse.ArgumentParser) -> None:
@@ -72,14 +74,18 @@ def _add_provider_args(p: argparse.ArgumentParser) -> None:
         metavar="FILE",
         help="Path to a TOML config file (e.g. payjoin_detector.toml)",
     )
-
+    p.add_argument(
+        "--async",
+        dest="use_async",
+        action="store_true",
+        help="Fetch transactions in parallel",
+    )
     p.add_argument(
         "--csv-output",
         default=None,
         metavar="FILE",
         help="Write txid,confidence rows to this CSV file (appends if file exists)",
     )
-
     p.add_argument(
         "--debug-output",
         default=None,
@@ -109,7 +115,6 @@ def build_parser() -> argparse.ArgumentParser:
     block_parser = subparsers.add_parser("block", help="Analyze block")
     block_parser.add_argument("blockhash", help="Block hash")
     block_parser.add_argument("--threshold", type=float, default=0.1, metavar="0.0-1.0")
-    block_parser.add_argument("--async", dest="use_async", action="store_true")
     _add_provider_args(block_parser)
 
     return parser
@@ -119,6 +124,8 @@ def get_provider(args: argparse.Namespace) -> provider.TransactionProvider:
     """Parse --config (if given), merge into args, then build the provider."""
     cfg = _load_config(getattr(args, "config", None))
     _apply_config(args, cfg)
+
+    use_async = getattr(args, "use_async", False)
 
     if args.provider == "bitcoin-core":
         missing = [
@@ -136,7 +143,12 @@ def get_provider(args: argparse.Namespace) -> provider.TransactionProvider:
                 print(f"  {m}", file=sys.stderr)
             sys.exit(1)
         return BitcoinCoreProvider(
-            rpc_url=args.rpc_url, rpc_user=args.rpc_user, rpc_password=args.rpc_password
+            rpc_url=args.rpc_url,
+            rpc_user=args.rpc_user,
+            rpc_password=args.rpc_password,
+            use_async=use_async,
         )
 
-    return EsploraProvider(args.esplora_url) if args.esplora_url else EsploraProvider()
+    if args.esplora_url:
+        return EsploraProvider(args.esplora_url, use_async=use_async)
+    return EsploraProvider(use_async=use_async)

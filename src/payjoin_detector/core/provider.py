@@ -12,6 +12,7 @@ class TransactionProvider(ABC):
     """
 
     supports_clustering: bool = False
+    use_async: bool = False
 
     @abstractmethod
     async def get_transaction(self, txid: str) -> Transaction:
@@ -35,10 +36,14 @@ class TransactionProvider(ABC):
         ...
 
     async def get_cluster_transactions(
-        self, tx: Transaction, depth: int = 1, max_txs_per_address: int = 50
+        self,
+        tx: Transaction,
+        depth: int = 1,
+        max_txs_per_address: int = 50,
     ) -> list[Transaction]:
         """
         Fetch all transactions needed for CIOH clustering.
+        Uses self.use_async to determine parallel fetching.
         Walks the transaction graph up to `depth` hops from each input address.
         Raises ProviderError on network / parsing failure.
         """

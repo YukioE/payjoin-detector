@@ -16,8 +16,8 @@ BLOCK_HASH = "00000000d1145790a8694403d4063f323d499e655c83426834d4ce2f8dd4a2ee"
 
 
 class TestCheckPayjoinPossible(unittest.IsolatedAsyncioTestCase):
-    def setUp(self):
-        self.provider = EsploraProvider(API)
+    async def asyncSetUp(self):
+        self.provider = EsploraProvider(API, use_async=True)
         self.detector = Detector(self.provider)
 
     async def test_valid_tx_returns_true(self):
@@ -39,22 +39,22 @@ class TestCheckPayjoinPossible(unittest.IsolatedAsyncioTestCase):
 
 class TestAnalyse(unittest.IsolatedAsyncioTestCase):
     async def asyncSetUp(self):
-        self.provider = EsploraProvider(API)
+        self.provider = EsploraProvider(API, use_async=True)
         self.detector = Detector(self.provider)
         self.tx = await self.provider.get_transaction(POTENTIAL_PAYJOIN_TX)
         self.result = self.detector.analyse(self.tx)
 
-    def test_returns_tx_detection_result(self):
+    async def test_returns_tx_detection_result(self):
         self.assertIsInstance(self.result, TxDetectionResult)
 
-    def test_result_txid_preserved(self):
+    async def test_result_txid_preserved(self):
         self.assertEqual(self.result.txid, POTENTIAL_PAYJOIN_TX)
 
-    def test_result_io_counts(self):
+    async def test_result_io_counts(self):
         self.assertEqual(self.result.input_count, 2)
         self.assertEqual(self.result.output_count, 2)
 
-    def test_confidence_clamped_between_0_and_1(self):
+    async def test_confidence_clamped_between_0_and_1(self):
         self.assertGreater(self.result.confidence, 0.0)
         self.assertLess(self.result.confidence, 1.0)
 
@@ -66,7 +66,7 @@ class TestAnalyse(unittest.IsolatedAsyncioTestCase):
 
 class TestDetect(unittest.IsolatedAsyncioTestCase):
     async def asyncSetUp(self):
-        self.provider = EsploraProvider(API)
+        self.provider = EsploraProvider(API, use_async=True)
         self.detector = Detector(self.provider)
         self.tx = await self.provider.get_transaction(POTENTIAL_PAYJOIN_TX)
 
@@ -81,7 +81,7 @@ class TestDetect(unittest.IsolatedAsyncioTestCase):
             )
 
     async def test_propagates_provider_error(self):
-        provider = EsploraProvider("")
+        provider = EsploraProvider("", use_async=True)
         detector = Detector(provider)
 
         with self.assertRaises(ProviderError):
@@ -90,7 +90,7 @@ class TestDetect(unittest.IsolatedAsyncioTestCase):
 
 class TestDetectBlock(unittest.IsolatedAsyncioTestCase):
     async def asyncSetUp(self):
-        self.provider = EsploraProvider(API)
+        self.provider = EsploraProvider(API, use_async=True)
         self.detector = Detector(self.provider)
         self.result = await self.detector.detect_block(BLOCK_HASH)
 

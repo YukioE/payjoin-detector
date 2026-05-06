@@ -14,28 +14,31 @@ BLOCK_HASH = "00000000d1145790a8694403d4063f323d499e655c83426834d4ce2f8dd4a2ee"
 
 
 class TestAnalyseTxid(unittest.IsolatedAsyncioTestCase):
+    async def asyncSetUp(self):
+        self.provider = EsploraProvider(API, use_async=True)
+
     async def test_returns_float(self):
-        result = await analyse_txid(POTENTIAL_PAYJOIN_TX, EsploraProvider(API))
+        result = await analyse_txid(POTENTIAL_PAYJOIN_TX, self.provider)
         self.assertIsInstance(result, float)
 
     async def test_confidence_clamped_between_0_and_1(self):
-        result = await analyse_txid(POTENTIAL_PAYJOIN_TX, EsploraProvider(API))
+        result = await analyse_txid(POTENTIAL_PAYJOIN_TX, self.provider)
         self.assertGreater(result, 0.0)
         self.assertLess(result, 1.0)
 
     async def test_coinbase_returns_zero_confidence(self):
-        result = await analyse_txid(COINBASE_TX, EsploraProvider(API))
+        result = await analyse_txid(COINBASE_TX, self.provider)
         self.assertEqual(result, 0.0)
 
     async def test_single_input_returns_zero_confidence(self):
-        result = await analyse_txid(ONE_INPUT_TX, EsploraProvider(API))
+        result = await analyse_txid(ONE_INPUT_TX, self.provider)
         self.assertEqual(result, 0.0)
 
     async def test_raises_transaction_not_found(self):
         with self.assertRaises(TransactionNotFoundError):
             await analyse_txid(
                 "0000000000000000000000000000000000000000000000000000000000000000",
-                EsploraProvider(API),
+                self.provider,
             )
 
     async def test_raises_provider_error_on_bad_base_url(self):
@@ -46,7 +49,8 @@ class TestAnalyseTxid(unittest.IsolatedAsyncioTestCase):
 
 class TestAnalyseBlock(unittest.IsolatedAsyncioTestCase):
     async def asyncSetUp(self):
-        self.result = await analyse_block(BLOCK_HASH, EsploraProvider(API))
+        self.provider = EsploraProvider(API, use_async=True)
+        self.result = await analyse_block(BLOCK_HASH, self.provider)
 
     async def test_returns_dict(self):
         self.assertIsInstance(self.result, dict)
@@ -70,7 +74,7 @@ class TestAnalyseBlock(unittest.IsolatedAsyncioTestCase):
             self.assertGreaterEqual(value, 0.1)
 
     async def test_zero_threshold_returns_all_txs(self):
-        result = await analyse_block(BLOCK_HASH, EsploraProvider(API), threshold=0.0)
+        result = await analyse_block(BLOCK_HASH, self.provider, threshold=0.0)
         self.assertEqual(len(result), 2)
 
     async def test_raises_block_not_found(self):
@@ -79,7 +83,7 @@ class TestAnalyseBlock(unittest.IsolatedAsyncioTestCase):
         with self.assertRaises(BlockNotFoundError):
             await analyse_block(
                 "0000000000000000000000000000000000000000000000000000000000000000",
-                EsploraProvider(API),
+                self.provider,
             )
 
     async def test_raises_provider_error_on_bad_base_url(self):

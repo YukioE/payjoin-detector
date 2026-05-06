@@ -34,6 +34,7 @@ class BitcoinCoreProvider(TransactionProvider):
         rpc_user:       RPC username
         rpc_password:   RPC password
         timeout:        HTTP request timeout in seconds
+        use_async:      If True, fetch transactions in parallel. Defaults to False.
     """
 
     def __init__(
@@ -42,10 +43,12 @@ class BitcoinCoreProvider(TransactionProvider):
         rpc_user: str = "",
         rpc_password: str = "",
         timeout: int = 10,
+        use_async: bool = False,
     ):
         self.rpc_url = rpc_url.rstrip("/")
         self._auth = base64.b64encode(f"{rpc_user}:{rpc_password}".encode()).decode()
         self.timeout = timeout
+        self.use_async = use_async
         self._id = 0
 
     async def get_transaction(self, txid: str) -> Transaction:

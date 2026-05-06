@@ -10,7 +10,7 @@ MULTIPLE_CLUSTER_TX = "e15c78ce01caeb85ba035f65b2afbe7e8b9d035bfe999b765b68df191
 
 class TestClusteringHeuristic(unittest.IsolatedAsyncioTestCase):
     async def asyncSetUp(self):
-        provider = EsploraProvider(API)
+        provider = EsploraProvider(API, use_async=True)
         self.single_cluster_tx = await provider.get_transaction(SINGLE_CLUSTER_TX)
         self.multiple_cluster_tx = await provider.get_transaction(MULTIPLE_CLUSTER_TX)
 

@@ -7,7 +7,7 @@ from payjoin_detector.core.provider import (
     ProviderError,
     TransactionNotFoundError,
 )
-from payjoin_detector.propagation_detect import detect_neighbours
+from payjoin_detector.neighbours import detect_neighbours
 
 
 async def cmd_tx(args, detector: Detector) -> None:
@@ -49,7 +49,7 @@ async def cmd_block(args, detector: Detector) -> None:
         _write_csv(args.csv_output, rows)
 
 
-async def cmd_propagation(args, detector: Detector) -> None:
+async def cmd_neighbours(args, detector: Detector) -> None:
     try:
         report = await detect_neighbours(
             detector,

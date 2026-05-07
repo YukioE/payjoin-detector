@@ -143,7 +143,7 @@ class NeighboursReport:
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>PayJoin Propagation Report</title>
+    <title>PayJoin Neighbours Report</title>
     <style>
         body {{ font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; margin: 0; padding: 10px; background: #f5f5f5; }}
         .container {{ background: white; border-radius: 4px; padding: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); overflow-x: auto; }}
@@ -162,7 +162,7 @@ class NeighboursReport:
 </head>
 <body>
     <div class="container">
-        <h1>PayJoin Propagation Analysis</h1>
+        <h1>PayJoin Neighbours Analysis</h1>
         <div class="info">
             <a href="https://mempool.space/tx/{self.target_result.txid}?mode=details" target="_blank">{self.target_result.txid}</a>
             ({len(self.neighbour_results)} neighbour txs)

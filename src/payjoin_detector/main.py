@@ -3,11 +3,11 @@
 Usage:
     python main.py tx    <txhash>
     python main.py block <blockhash>
-    python main.py propagation <txhash>
+    python main.py neighbours <txhash>
 """
 
 import asyncio
-from payjoin_detector.cli.commands import cmd_block, cmd_propagation, cmd_tx
+from payjoin_detector.cli.commands import cmd_block, cmd_neighbours, cmd_tx
 from payjoin_detector.cli.parser import build_parser, get_provider
 from payjoin_detector.detector import Detector
 from payjoin_detector.cli.debug import setup_debug_logger
@@ -25,8 +25,8 @@ async def async_main() -> None:
         await cmd_tx(args, detector)
     elif args.command == "block":
         await cmd_block(args, detector)
-    elif args.command == "propagation":
-        await cmd_propagation(args, detector)
+    elif args.command == "neighbours":
+        await cmd_neighbours(args, detector)
 
 
 def main() -> None:

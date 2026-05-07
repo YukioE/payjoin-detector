@@ -117,17 +117,17 @@ def build_parser() -> argparse.ArgumentParser:
     block_parser.add_argument("--threshold", type=float, default=0.1, metavar="0.0-1.0")
     _add_provider_args(block_parser)
 
-    prop_parser = subparsers.add_parser(
-        "propagation", help="Inter-transaction propagation analysis"
+    neighbours_parser = subparsers.add_parser(
+        "neighbours", help="Analyze transaction neighbours (prevouts and outspends)"
     )
-    prop_parser.add_argument("txid", help="Transaction ID")
-    prop_parser.add_argument(
+    neighbours_parser.add_argument("txid", help="Transaction ID")
+    neighbours_parser.add_argument(
         "--html-output",
         default=None,
         metavar="FILE",
         help="Save report as HTML file instead of printing to console",
     )
-    _add_provider_args(prop_parser)
+    _add_provider_args(neighbours_parser)
 
     return parser
 

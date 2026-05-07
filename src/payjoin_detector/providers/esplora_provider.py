@@ -51,7 +51,7 @@ class EsploraProvider(TransactionProvider):
         self.use_async = use_async
         self._sem = asyncio.Semaphore(max_concurrent)
 
-    supports_clustering = True
+    supports_clustering = False
 
     async def get_transaction(self, txid: str) -> Transaction:
         raw = await asyncio.to_thread(self._fetch_json, f"{self.base_url}/tx/{txid}")

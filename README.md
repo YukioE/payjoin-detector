@@ -7,13 +7,14 @@ A lightweight tool to detect potential PayJoin transactions using heuristic anal
 - Detect PayJoin likelihood for:
   - Single transactions
   - Entire blocks
+  - Transaction neighbours (prevouts and outspends)
 
 - Pluggable providers:
   - Esplora API
   - Bitcoin Core RPC
 
 - Heuristic-based scoring system (0.0 → 1.0 confidence)
-- Optional CSV + debug logging
+- Optional CSV, debug logging, and HTML neighbour reports
 
 ---
 
@@ -28,30 +29,31 @@ cd payjoin-detector\src
 
 ## Configuration (optional)
 
-Create a `.toml` file and use with `--config <path to .toml>`:
+Create a `.toml` file and use it with `--config <file>`. CLI flags override config values.
+
+Recommended setup: run your own Bitcoin Core node and point the detector at a local Blockstream/electrs (Esplora-compatible) instance. This avoids API rate limits and is the most reliable option for block and neighbour analysis.
 
 ```toml
 [provider]
 type = "esplora" # "esplora" | "bitcoin-core" default: esplora
+async = true # default: false
 
 [esplora]
 url = "https://mempool.space/api" # default: mempool
 
 [bitcoin_core]
-rpc_url  = "http://127.0.0.1:8332" # default: no url
+rpc_url = "http://127.0.0.1:8332" # default: no url
 rpc_user = "user" # default: no user
 rpc_password = "password" # default: no password
 
 [block]
 threshold = 0.2 # default: 0.1
-async     = true # default: false
 
 [output]
 csv_file = "results.csv" # default: no csv output
 debug_file = "debug.log" # default: no debug file
+html_file = "report.html" # default: no html report
 ```
-
-CLI arguments override config values, comment lines using `#` to use default values
 
 ---
 
@@ -69,7 +71,29 @@ python -m payjoin_detector tx <txid>
 python -m payjoin_detector block <blockhash>
 ```
 
-- remember that most online apis have limits on their usage, even fetching a block with just 1000 tx and no async behaviour will most likely hit those limits. It is recommended to use your own Bitcoin Core node since its much faster than online apis.
+### Analyze transaction neighbours
+
+```bash
+python -m payjoin_detector neighbours <txid> --html-output report.html
+```
+
+### Common options
+
+- `--config <file>`: load provider/output defaults from TOML
+- `--provider esplora|bitcoin-core`: choose the backend
+- `--async`: fetch transactions in parallel
+- `--csv-output <file>`: append `txid,confidence` rows
+- `--debug-output <file>`: write debug logs
+- `--threshold <0.0-1.0>`: block confidence cutoff
+- `--html-output <file>`: save neighbour analysis as HTML
+
+---
+
+## Output
+
+- `tx`: txid, input/output counts, confidence, heuristic signals
+- `block`: block summary plus all transactions above the threshold
+- `neighbours`: console report or HTML report for prevouts/outspends
 
 ---
 
@@ -78,20 +102,3 @@ python -m payjoin_detector block <blockhash>
 1. Fetch transaction(s) from a provider
 2. Run a set of heuristics
 3. Aggregate scores into a confidence value
-
----
-
-## Output
-
-Each transaction returns:
-
-- `txid`
-- `input_count`
-- `output_count`
-- `confidence` (0.0–1.0)
-- heuristic signals
-
-Block analysis also reports:
-
-- total transactions
-- number above threshold

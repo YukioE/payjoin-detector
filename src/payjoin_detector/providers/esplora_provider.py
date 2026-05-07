@@ -182,7 +182,7 @@ class EsploraProvider(TransactionProvider):
         self,
         tx: Transaction,
         depth: int = 1,
-        max_txs_per_address: int = 250,
+        max_txs_per_address: int = 1000,
     ) -> list[Transaction]:
         """Fetch all transactions needed for CIOH clustering."""
         visited_addresses: set[str] = set()

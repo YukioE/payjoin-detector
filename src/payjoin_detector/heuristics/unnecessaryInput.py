@@ -18,7 +18,8 @@ class UnnecessaryInputHeuristic(Heuristic):
         for i in tx.inputs:
             if i.prevout is None:
                 return HeuristicResult(
-                    name=self.name, score=0.0, signal="missing prevout data"
+                    name=self.name, score=0.0, signal="missing prevout data",
+                    html_signal="—"
                 )
             input_values.append(i.prevout.value)
 
@@ -29,6 +30,7 @@ class UnnecessaryInputHeuristic(Heuristic):
                 name=self.name,
                 score=0.0,
                 signal="either input or output values missing",
+                html_signal="—"
             )
 
         min_input = min(input_values)
@@ -39,9 +41,11 @@ class UnnecessaryInputHeuristic(Heuristic):
                 name=self.name,
                 score=1.5,
                 signal=f"UIH2 smallest output ({min_output} sat) > smallest input ({min_input} sat)",
+                html_signal="UIH2"
             )
         return HeuristicResult(
             name=self.name,
             score=0.0,
             signal=f"UIH1 optimal change detected, smallest output ({min_output} sat) < smallest input ({min_input} sat)",
+            html_signal="UIH1"
         )

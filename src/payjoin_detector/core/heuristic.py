@@ -13,6 +13,7 @@ class HeuristicResult:
     name: str
     score: float
     signal: str | None
+    html_signal: str | None = None
 
 
 class Heuristic(ABC):

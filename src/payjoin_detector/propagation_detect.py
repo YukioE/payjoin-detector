@@ -131,8 +131,8 @@ class NeighboursReport:
                         else "#999"
                     )
 
-                    # Extract key value from signal
-                    key_value = self._extract_key_value(heur_name, heur_match)
+                    # Extract html_signal from result if available
+                    key_value = self._extract_key_value(heur_name, heur_match, result)
 
                     data_rows += f"<td style='color:{color}'>{key_value}</td>"
                 else:
@@ -175,120 +175,17 @@ class NeighboursReport:
 </body>
 </html>"""
 
-    def _extract_key_value(self, heur_name: str, signal: str) -> str:
-        """Extract the most important value from a heuristic signal."""
+    def _extract_key_value(self, heur_name: str, signal: str, result: TxDetectionResult) -> str:
+        """Extract the most important value from heuristic result."""
+        # Try to find the matching heuristic in the result object for html_signal
+        for heur_result in result.heuristics_results:
+            if heur_result.name == heur_name and heur_result.html_signal:
+                return heur_result.html_signal
+        
+        # Fallback to signal parsing if html_signal not available
         import re
-
         msg = signal.split(": ", 1)[1] if ": " in signal else ""
-
-        # nSequence asymmetry: extract the nSequence value
-        if "nSequence" in heur_name:
-            match = re.search(r"(\d+)", msg)
-            return match.group(1) if match else "same"
-
-        # Round fee: extract fee rate value only (without "sat/vb")
-        if "Round fee" in heur_name:
-            match = re.search(r"([\d.]+)\s*sat/vb", msg)
-            return match.group(1) if match else "—"
-
-        # Signature asymmetry: extract unique signature types
-        if "Signature asymmetry" in heur_name:
-            if "consistent" in msg:
-                match = re.search(r"'([^']+)'", msg)
-                return match.group(1) if match else "consistent"
-            else:
-                # Extract all unique types from dict
-                match = re.search(r"\{([^}]+)\}", msg)
-                if match:
-                    types = match.group(1)
-                    unique = set()
-                    for pair in types.split(","):
-                        if ":" in pair:
-                            t = pair.split(":")[1].strip().strip("'\"")
-                            unique.add(t)
-                    return ", ".join(sorted(unique)) if unique else "asymmetric"
-            return "—"
-
-        # Clustering: extract number of clusters or status
-        if "Clustering" in heur_name:
-            if "same cluster" in msg:
-                return "1 cluster"
-            match = re.search(r"(\d+)\s*distinct clusters", msg)
-            return f"{match.group(1)} clusters" if match else "N/A"
-
-        # Mixed input types: show the actual type when all same, or show they differ
-        if "Mixed input types" in heur_name:
-            if "same type" in msg:
-                match = re.search(r"- ([^\n]+)$", msg)
-                return match.group(1) if match else "same"
-            return "mixed types"
-
-        # Mixed output types: show the types
-        if "Mixed output types" in heur_name:
-            if "same type" in msg:
-                match = re.search(r"- ([^\n]+)$", msg)
-                return match.group(1) if match else "same"
-            else:
-                # Extract set of types
-                match = re.search(r"\{([^}]+)\}", msg)
-                if match:
-                    types = match.group(1).replace("'", "").split(", ")
-                    return ", ".join(types[:2])  # Show first 2 types
-                return "mixed"
-
-        # Round output: show if mixed or if non-round/round
-        if "Round output" in heur_name:
-            if "mixed" in msg.lower():
-                return "mixed"
-            if "non-round" in msg.lower():
-                return "non-round"
-            return "—"
-
-        # Round payment assignment: extract payment value if detected
-        if "Round payment" in heur_name:
-            if "exactly 2 inputs and 2 outputs" in msg:
-                return "N/A"
-            # Check if it's a positive detection
-            if "[+]" in signal:
-                # Extract value pattern: number + unit
-                import re
-
-                match = re.search(r"([\d.]+)\s*(sat|BTC|btc)", msg)
-                if match:
-                    return f"{match.group(1)} {match.group(2).lower()}"
-                return "round"
-            return "not detected"
-
-        # CoinJoin: check if enough inputs/outputs
-        if "CoinJoin" in heur_name:
-            if "not enough" in msg.lower():
-                return "<5 inputs"
-            return "possible"
-
-        # Small I/O counts: show the actual count
-        if "Small I/O" in heur_name:
-            match = re.search(r"(\d+/\d+)", msg)
-            return match.group(1) if match else "small"
-
-        # Unnecessary input: extract the specific rule (UIH1, UIH2, etc)
-        if "Unnecessary" in heur_name:
-            match = re.search(r"(UIH\d+)", msg)
-            if match:
-                rule = match.group(1)
-                # Extract what the rule detected
-                if "optimal change" in msg:
-                    return f"{rule}"
-                return rule
-            return "—"
-
-        # Address reuse: show if reused or not
-        if "Address reuse" in heur_name:
-            if "no address reuse" in msg.lower():
-                return "none"
-            if "reuse" in msg.lower():
-                return "detected"
-            return "—"
-
+        
         # Default: try to extract any numeric value
         match = re.search(r"[\d.]+", msg)
         return match.group(0) if match else "—"

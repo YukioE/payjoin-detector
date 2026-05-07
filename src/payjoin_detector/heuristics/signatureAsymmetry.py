@@ -25,6 +25,7 @@ class SignatureAsymmetryHeuristic(Heuristic):
                 name=self.name,
                 score=0.0,
                 signal=f"mixed input types ({input_types}) - asymmetry expected",
+                html_signal="—"
             )
 
         # Check signature R-types
@@ -65,21 +66,27 @@ class SignatureAsymmetryHeuristic(Heuristic):
                 except Exception:
                     continue
 
-        r_types_string = dict(list(input_r_types.items())[:5])
-
         if len(r_types) > 1:
+            types_str = ", ".join(sorted(r_types))
             return HeuristicResult(
                 name=self.name,
                 score=2.0,
-                signal=f"signature asymmetry detected - {r_types_string}",
+                signal=f"signature asymmetry detected - {input_r_types}",
+                html_signal=f"{{{types_str}}}"
             )
         else:
-            return HeuristicResult(
-                name=self.name,
-                score=0.0,
-                signal=(
-                    f"all signatures consistent - {r_types_string}"
-                    if input_r_types
-                    else "no signature data"
-                ),
-            )
+            if input_r_types:
+                r_type = list(r_types)[0] if r_types else "unknown"
+                return HeuristicResult(
+                    name=self.name,
+                    score=0.0,
+                    signal=f"all signatures consistent - {input_r_types}",
+                    html_signal=f"{{{r_type}}}"
+                )
+            else:
+                return HeuristicResult(
+                    name=self.name,
+                    score=0.0,
+                    signal="no signature data",
+                    html_signal="—"
+                )

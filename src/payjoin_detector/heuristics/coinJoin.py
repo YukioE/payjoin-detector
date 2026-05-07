@@ -24,6 +24,7 @@ class CoinJoinHeuristic(Heuristic):
                 name=self.name,
                 score=0.0,
                 signal="not enough inputs/outputs to be CoinJoin (need >=5 each)",
+                html_signal="Too few inputs/outputs"
             )
 
         # Condition 2: no address reuse between inputs and outputs
@@ -48,6 +49,7 @@ class CoinJoinHeuristic(Heuristic):
                 name=self.name,
                 score=0.0,
                 signal="address reuse detected - not a CoinJoin pattern",
+                html_signal="Address reuse"
             )
 
         # Condition 3: unique value diversity check
@@ -63,10 +65,12 @@ class CoinJoinHeuristic(Heuristic):
                 signal=(
                     f"CoinJoin pattern detected - {len(inputs)} inputs, {len(outputs)} outputs"
                 ),
+                html_signal="Possible CoinJoin"
             )
 
         return HeuristicResult(
             name=self.name,
             score=0.0,
             signal="no CoinJoin pattern detected",
+            html_signal="Not CoinJoin"
         )

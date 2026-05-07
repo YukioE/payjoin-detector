@@ -158,6 +158,7 @@ class RoundFeeHeuristic(Heuristic):
                 name=self.name,
                 score=0.0,
                 signal="insufficient data to evaluate fee rate",
+                html_signal="—"
             )
 
         actual_weight = tx.weight if tx.weight else estimate_tx_weight(tx)
@@ -168,6 +169,7 @@ class RoundFeeHeuristic(Heuristic):
                 name=self.name,
                 score=0.0,
                 signal=(f"fee rate {actual_fee_rate:.2f} sat/vb is round"),
+                html_signal=f"Round: {actual_fee_rate:.1f} sat/vB"
             )
 
         # Non-round fee rate: run the input removal test
@@ -190,10 +192,12 @@ class RoundFeeHeuristic(Heuristic):
                 signal=(
                     f"fee rate {actual_fee_rate:.2f} sat/vb is non-round; removing input(s) restores a round rate: {details}"
                 ),
+                html_signal=f"Non-round: {actual_fee_rate:.1f} → {suspicious_inputs[0][1]:.1f}"
             )
 
         return HeuristicResult(
             name=self.name,
             score=-0.25,
             signal=(f"fee rate {actual_fee_rate:.2f} sat/vb is non-round"),
+            html_signal=f"Non-round: {actual_fee_rate:.1f} sat/vB"
         )

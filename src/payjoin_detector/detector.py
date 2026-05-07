@@ -192,4 +192,5 @@ class Detector:
             output_count=len(tx.outputs),
             confidence=confidence,
             heuristics=heuristic_strings,
+            heuristics_results=results,
         )

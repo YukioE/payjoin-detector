@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from payjoin_detector.core.heuristic import HeuristicResult
 
 
 @dataclass
@@ -8,6 +9,7 @@ class TxDetectionResult:
     output_count: int
     confidence: float
     heuristics: list[str]
+    heuristics_results: list[HeuristicResult] | None = None
 
 
 @dataclass

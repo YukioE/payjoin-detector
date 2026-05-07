@@ -37,6 +37,10 @@ def _apply_config(args: argparse.Namespace, cfg: dict) -> None:
     if args.debug_output is None and "debug_file" in output:
         args.debug_output = output["debug_file"]
 
+    # html output
+    if hasattr(args, "html_output") and args.html_output is None and "html_file" in output:
+        args.html_output = output["html_file"]
+
     # provider type
     if args.provider == "esplora" and "type" in prov:
         args.provider = prov["type"]

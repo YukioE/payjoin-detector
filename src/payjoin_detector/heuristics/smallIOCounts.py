@@ -18,11 +18,11 @@ class SmallIOCountsHeuristic(Heuristic):
         if input_count <= 3 and output_count == 2:
             return HeuristicResult(
                 name=self.name, score=1.0, signal=f"I/O count is {input_count}/2",
-                html_signal=f"{input_count}/2"
+                html_signal="small"
             )
         elif input_count <= 5 and output_count <= 3:
             return HeuristicResult(
-                name=self.name, score=0.5, signal="small I/O counts detected",
+                name=self.name, score=0.5, signal=f"I/O count is {input_count}/{output_count}",
                 html_signal="small"
             )
         else:

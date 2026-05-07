@@ -22,7 +22,7 @@ class NSequenceAsymmetryHeuristic(Heuristic):
         seq_values = {input.sequence for input in tx.inputs}
 
         if len(seq_values) > 1:
-            values_str = ", ".join(str(v) for v in sorted(seq_values))
+            values_str = ", ".join(hex(v) for v in sorted(seq_values))
             return HeuristicResult(
                 name=self.name,
                 score=2.0,
@@ -35,5 +35,5 @@ class NSequenceAsymmetryHeuristic(Heuristic):
                 name=self.name,
                 score=0.0,
                 signal=f"all inputs have same nSequence - {seq_value}",
-                html_signal=f"{{{seq_value}}}"
+                html_signal=f"{{{hex(seq_value)}}}"
             )

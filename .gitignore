@@ -1,1 +1,6 @@
 **/__pycache__/**
+/build/**
+/src/payjoin_detector.egg-info/**
+**/results.csv
+**/report.html
+**/debug.log

@@ -112,7 +112,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="PayJoin detector")
     subparsers = parser.add_subparsers(dest="command", required=True)
 
-    tx_parser = subparsers.add_parser("tx", help="Analyze single transaction")
+    tx_parser = subparsers.add_parser("transaction", aliases=["tx"], help="Analyze single transaction")
     tx_parser.add_argument("txid", help="Transaction ID")
     _add_provider_args(tx_parser)
 

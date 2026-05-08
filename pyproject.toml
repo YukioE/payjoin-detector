@@ -1,0 +1,16 @@
+[project]
+name = "payjoin-detector"
+version = "0.1.0"
+description = "Heuristic PayJoin detector for Bitcoin transactions"
+readme = "README.md"
+
+[project.scripts]
+payjoin-detector = "payjoin_detector.main:main"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["payjoin_detector*"]
+namespaces = true

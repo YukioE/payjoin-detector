@@ -21,7 +21,7 @@ async def async_main() -> None:
 
     setup_debug_logger(getattr(args, "debug_output", None))
 
-    if args.command == "tx":
+    if args.command in ("transaction", "tx"):
         await cmd_tx(args, detector)
     elif args.command in ("block", "bl"):
         await cmd_block(args, detector)

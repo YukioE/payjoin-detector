@@ -23,9 +23,9 @@ async def async_main() -> None:
 
     if args.command == "tx":
         await cmd_tx(args, detector)
-    elif args.command == "block":
+    elif args.command in ("block", "bl"):
         await cmd_block(args, detector)
-    elif args.command == "neighbours":
+    elif args.command in ("neighbours", "nb"):
         await cmd_neighbours(args, detector)
 
 

@@ -116,13 +116,13 @@ def build_parser() -> argparse.ArgumentParser:
     tx_parser.add_argument("txid", help="Transaction ID")
     _add_provider_args(tx_parser)
 
-    block_parser = subparsers.add_parser("block", help="Analyze block")
+    block_parser = subparsers.add_parser("block", aliases=["bl"], help="Analyze block")
     block_parser.add_argument("blockhash", help="Block hash")
     block_parser.add_argument("--threshold", type=float, default=0.1, metavar="0.0-1.0")
     _add_provider_args(block_parser)
 
     neighbours_parser = subparsers.add_parser(
-        "neighbours", help="Analyze transaction neighbours (prevouts and outspends)"
+        "neighbours", aliases=["nb"], help="Analyze transaction neighbours (prevouts and outspends)"
     )
     neighbours_parser.add_argument("txid", help="Transaction ID")
     neighbours_parser.add_argument(

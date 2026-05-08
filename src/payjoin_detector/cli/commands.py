@@ -41,11 +41,15 @@ async def cmd_block(args, detector: Detector) -> None:
 
     print_block_result(block_result)
     if getattr(args, "csv_output", None):
-        rows = [
-            (r.txid, r.confidence)
-            for r in block_result.results
-            if r.confidence >= threshold
-        ]
+        rows = sorted(
+            [
+                (r.txid, r.confidence)
+                for r in block_result.results
+                if r.confidence >= threshold
+            ],
+            key=lambda row: row[1],
+            reverse=True,
+        )
         _write_csv(args.csv_output, rows)
 
 
@@ -61,7 +65,7 @@ async def cmd_neighbours(args, detector: Detector) -> None:
     except ProviderError as e:
         print(f"Error fetching transaction: {e}")
         return
-    
+
     html_output = getattr(args, "html_output", None)
     if html_output:
         html_content = report.to_html()

@@ -28,15 +28,20 @@ class SignatureAsymmetryHeuristic(Heuristic):
                 html_signal="—"
             )
 
-        # Check signature R-types
+        # Check signature R-types (limit to first 10 signatures)
         input_r_types = {}
         r_types = set()
+        sig_count = 0
+        max_sigs = 10
 
         for idx, inp in enumerate(tx.inputs):
             if not inp.witness:
                 continue
 
             for item in inp.witness:
+                if sig_count >= max_sigs:
+                    break
+
                 sig_bytes = bytes.fromhex(item) if isinstance(item, str) else item
 
                 if len(sig_bytes) < 3:
@@ -60,11 +65,15 @@ class SignatureAsymmetryHeuristic(Heuristic):
 
                     input_r_types[idx] = r_type
                     r_types.add(r_type)
+                    sig_count += 1
 
                     break
 
                 except Exception:
                     continue
+
+            if sig_count >= max_sigs:
+                break
 
         if len(r_types) > 1:
             types_str = ", ".join(sorted(r_types))

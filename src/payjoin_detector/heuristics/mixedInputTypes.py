@@ -28,7 +28,7 @@ class MixedInputTypesHeuristic(Heuristic):
                 name=self.name,
                 score=0.0,
                 signal="no prevout data to determine input types",
-                html_signal="—"
+                html_signal="—",
             )
 
         tx_time = tx.status.block_time
@@ -40,7 +40,7 @@ class MixedInputTypesHeuristic(Heuristic):
                     name=self.name,
                     score=-3.0,
                     signal=f"mixed input types before Sep 2024 - {input_types}",
-                    html_signal=f"mixed types (pre 09-2024)"
+                    html_signal=f"mixed types (pre 09-2024)",
                 )
             else:
                 types_list = ", ".join(sorted(input_types))
@@ -48,7 +48,7 @@ class MixedInputTypesHeuristic(Heuristic):
                     name=self.name,
                     score=0.0,
                     signal=f"mixed input types - {input_types}",
-                    html_signal=f"{{{types_list}}}"
+                    html_signal=f"{{{types_list}}}",
                 )
 
         input_type = input_types.pop()
@@ -56,5 +56,5 @@ class MixedInputTypesHeuristic(Heuristic):
             name=self.name,
             score=0.4,
             signal=f"all inputs same type - {input_type}",
-            html_signal=f"{{{input_type}}}"
+            html_signal=f"{{{input_type}}}",
         )

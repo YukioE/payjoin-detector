@@ -20,7 +20,7 @@ class MixedOutputTypesHeuristic(Heuristic):
                 name=self.name,
                 score=0.0,
                 signal="no prevout data to determine input types",
-                html_signal="—"
+                html_signal="—",
             )
 
         if len(output_types) > 1:
@@ -29,7 +29,7 @@ class MixedOutputTypesHeuristic(Heuristic):
                 name=self.name,
                 score=0.0,
                 signal=f"mixed output types - {output_types}",
-                html_signal=f"{{{types_list}}}"
+                html_signal=f"{{{types_list}}}",
             )
 
         output_type = output_types.pop()
@@ -37,5 +37,5 @@ class MixedOutputTypesHeuristic(Heuristic):
             name=self.name,
             score=0.3,
             signal=f"all outputs same type - {output_type}",
-            html_signal=f"{{{output_type}}}"
+            html_signal=f"{{{output_type}}}",
         )

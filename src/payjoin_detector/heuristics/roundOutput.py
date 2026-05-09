@@ -16,8 +16,10 @@ class RoundOutputHeuristic(Heuristic):
     def check(self, tx: Transaction) -> HeuristicResult:
         if not tx.outputs:
             return HeuristicResult(
-                name=self.name, score=0.0, signal="no outputs to analyze",
-                html_signal="—"
+                name=self.name,
+                score=0.0,
+                signal="no outputs to analyze",
+                html_signal="—",
             )
 
         round_threshold = 100
@@ -28,19 +30,19 @@ class RoundOutputHeuristic(Heuristic):
                 name=self.name,
                 score=-1.0,
                 signal=f"all outputs are round multiples of {round_threshold} sats, unlikely PayJoin",
-                html_signal="All round"
+                html_signal="All round",
             )
         elif all(not r for r in is_round):
             return HeuristicResult(
                 name=self.name,
                 score=0.2,
                 signal="all outputs non-round",
-                html_signal="All non-round"
+                html_signal="All non-round",
             )
         else:
             return HeuristicResult(
                 name=self.name,
                 score=-0.5,
                 signal="mixed round and non-round outputs",
-                html_signal="Mixed (round/non-round)"
+                html_signal="Mixed (round/non-round)",
             )

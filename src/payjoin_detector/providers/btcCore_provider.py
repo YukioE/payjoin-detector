@@ -55,9 +55,7 @@ class BitcoinCoreProvider(TransactionProvider):
         raw = await asyncio.to_thread(self._rpc_getrawtransaction, txid)
         return self._parse(raw)
 
-    async def get_transactions(
-        self, txids: list[str]
-    ) -> list[Transaction]:
+    async def get_transactions(self, txids: list[str]) -> list[Transaction]:
         """
         Fetch and parse multiple transactions by txid.
 
@@ -76,9 +74,7 @@ class BitcoinCoreProvider(TransactionProvider):
                 raise e
         return transactions
 
-    async def get_block_transactions(
-        self, block_hash: str
-    ) -> list[Transaction]:
+    async def get_block_transactions(self, block_hash: str) -> list[Transaction]:
         """
         Fetch all transactions from a block_hash.
 

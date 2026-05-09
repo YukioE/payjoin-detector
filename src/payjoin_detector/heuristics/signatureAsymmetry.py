@@ -25,7 +25,7 @@ class SignatureAsymmetryHeuristic(Heuristic):
                 name=self.name,
                 score=0.0,
                 signal=f"mixed input types ({input_types}) - asymmetry expected",
-                html_signal="—"
+                html_signal="—",
             )
 
         # Check signature R-types (limit to first 10 signatures)
@@ -81,7 +81,7 @@ class SignatureAsymmetryHeuristic(Heuristic):
                 name=self.name,
                 score=2.0,
                 signal=f"signature asymmetry detected - {input_r_types}",
-                html_signal=f"{{{types_str}}}"
+                html_signal=f"{{{types_str}}}",
             )
         else:
             if input_r_types:
@@ -90,12 +90,12 @@ class SignatureAsymmetryHeuristic(Heuristic):
                     name=self.name,
                     score=0.0,
                     signal=f"all signatures consistent - {input_r_types}",
-                    html_signal=f"{{{r_type}}}"
+                    html_signal=f"{{{r_type}}}",
                 )
             else:
                 return HeuristicResult(
                     name=self.name,
                     score=0.0,
                     signal="no signature data",
-                    html_signal="—"
+                    html_signal="—",
                 )

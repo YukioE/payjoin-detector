@@ -15,8 +15,10 @@ class NSequenceAsymmetryHeuristic(Heuristic):
     def check(self, tx: Transaction) -> HeuristicResult:
         if not tx.inputs:
             return HeuristicResult(
-                name=self.name, score=0.0, signal="no inputs to analyze",
-                html_signal="—"
+                name=self.name,
+                score=0.0,
+                signal="no inputs to analyze",
+                html_signal="—",
             )
 
         seq_values = {input.sequence for input in tx.inputs}
@@ -27,7 +29,7 @@ class NSequenceAsymmetryHeuristic(Heuristic):
                 name=self.name,
                 score=2.0,
                 signal=f"asymmetric nSequence values detected - {seq_values}",
-                html_signal=f"{{{values_str}}}"
+                html_signal=f"{{{values_str}}}",
             )
         else:
             seq_value = seq_values.pop()
@@ -35,5 +37,5 @@ class NSequenceAsymmetryHeuristic(Heuristic):
                 name=self.name,
                 score=0.0,
                 signal=f"all inputs have same nSequence - {seq_value}",
-                html_signal=f"{{{hex(seq_value)}}}"
+                html_signal=f"{{{hex(seq_value)}}}",
             )

@@ -19,7 +19,7 @@ class InputValueDisparityHeuristic(Heuristic):
                 name=self.name,
                 score=0.0,
                 signal="no input values to analyze",
-                html_signal="—"
+                html_signal="—",
             )
 
         min_value = min(values)
@@ -32,12 +32,12 @@ class InputValueDisparityHeuristic(Heuristic):
                 name=self.name,
                 score=0.3,
                 signal="large delta between min and max input values detected",
-                html_signal="—"
+                html_signal="—",
             )
         else:
             return HeuristicResult(
                 name=self.name,
                 score=0.0,
                 signal="no large disparity between min and max input values detected",
-                html_signal="—"
+                html_signal="—",
             )

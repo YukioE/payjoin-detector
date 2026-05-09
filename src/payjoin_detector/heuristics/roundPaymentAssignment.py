@@ -18,7 +18,7 @@ class RoundPaymentAssignmentHeuristic(Heuristic):
                 name=self.name,
                 score=0.0,
                 signal="TX does not have exactly 2 inputs and 2 outputs",
-                html_signal="Wrong structure"
+                html_signal="Wrong structure",
             )
 
         inputs: list[int] = [inp.prevout.value for inp in tx.inputs if inp.prevout]
@@ -29,7 +29,7 @@ class RoundPaymentAssignmentHeuristic(Heuristic):
                 name=self.name,
                 score=0.0,
                 signal="No inputs or outputs to analyze",
-                html_signal="—"
+                html_signal="—",
             )
 
         round_matches = []
@@ -50,12 +50,12 @@ class RoundPaymentAssignmentHeuristic(Heuristic):
                 name=self.name,
                 score=1.0,
                 signal=f"Round payment detected - {round_matches}",
-                html_signal=f"payment found ({payment} sats)"
+                html_signal=f"payment found ({payment} sats)",
             )
 
         return HeuristicResult(
             name=self.name,
             score=0.0,
             signal="no round payment detected",
-            html_signal="No round payment"
+            html_signal="No round payment",
         )

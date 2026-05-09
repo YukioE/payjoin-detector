@@ -33,19 +33,19 @@ class AddressReuseHeuristic(Heuristic):
                     name=self.name,
                     score=-1.0,
                     signal=f"input address(es) reappear in outputs: {reused}",
-                    html_signal="address reused"
+                    html_signal="address reused",
                 )
             else:
                 return HeuristicResult(
                     name=self.name,
                     score=-1.0,
                     signal=f"input address(es) reappear in outputs: {reused}",
-                    html_signal=f"{len(reused)} addresses reused"
+                    html_signal=f"{len(reused)} addresses reused",
                 )
         else:
             return HeuristicResult(
                 name=self.name,
                 score=0.0,
                 signal="no address reuse detected",
-                html_signal="no reuse"
+                html_signal="no reuse",
             )

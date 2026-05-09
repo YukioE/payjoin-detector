@@ -38,7 +38,11 @@ def _apply_config(args: argparse.Namespace, cfg: dict) -> None:
         args.debug_output = output["debug_file"]
 
     # html output
-    if hasattr(args, "html_output") and args.html_output is None and "html_file" in output:
+    if (
+        hasattr(args, "html_output")
+        and args.html_output is None
+        and "html_file" in output
+    ):
         args.html_output = output["html_file"]
 
     # provider type
@@ -112,7 +116,9 @@ def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="PayJoin detector")
     subparsers = parser.add_subparsers(dest="command", required=True)
 
-    tx_parser = subparsers.add_parser("transaction", aliases=["tx"], help="Analyze single transaction")
+    tx_parser = subparsers.add_parser(
+        "transaction", aliases=["tx"], help="Analyze single transaction"
+    )
     tx_parser.add_argument("txid", help="Transaction ID")
     _add_provider_args(tx_parser)
 
@@ -122,7 +128,9 @@ def build_parser() -> argparse.ArgumentParser:
     _add_provider_args(block_parser)
 
     neighbours_parser = subparsers.add_parser(
-        "neighbours", aliases=["nb"], help="Analyze transaction neighbours (prevouts and outspends)"
+        "neighbours",
+        aliases=["nb"],
+        help="Analyze transaction neighbours (prevouts and outspends)",
     )
     neighbours_parser.add_argument("txid", help="Transaction ID")
     neighbours_parser.add_argument(

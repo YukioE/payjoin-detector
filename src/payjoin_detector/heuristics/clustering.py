@@ -43,7 +43,7 @@ class ClusteringHeuristic(Heuristic):
                 name=self.name,
                 score=0.0,
                 signal="fewer than 2 input addresses — clustering not applicable",
-                html_signal="—"
+                html_signal="—",
             )
         uf = UnionFind()
 
@@ -61,14 +61,14 @@ class ClusteringHeuristic(Heuristic):
                 signal=(
                     f"all {len(input_addresses)} input addresses belong to the same cluster"
                 ),
-                html_signal="Single cluster"
+                html_signal="Single cluster",
             )
         else:
             return HeuristicResult(
                 name=self.name,
                 score=0.0,
                 signal=(f"input addresses span {n_clusters} distinct clusters"),
-                html_signal=f"{n_clusters} separate clusters"
+                html_signal=f"{n_clusters} separate clusters",
             )
 
     def _apply_cioh(self, txn: Transaction, uf: UnionFind) -> None:

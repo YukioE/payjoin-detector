@@ -140,3 +140,72 @@ Confidence : 30.91%
 ```
 
 > recommended to use with --html-output <file.html> or a config specifying an html output
+
+## Heuristics
+
+short description of each heuristic used, see `src/payjoin_detector/heuristics/` for actual implementations
+
+1. **Input/Output Counts**
+   - PayJoin requires ≥2 inputs (sender + receiver both contribute)
+   - Single-input transactions are impossible for PayJoin
+   - Typical PayJoins have ≥2 outputs (payment + change)
+
+2. **Address Diversity (Inputs & Outputs)**
+   - At least 2 distinct addresses required on input side and output side
+   - If all inputs belong to one address, they're from the same entity (same case as 1., impossible for PayJoin)
+   - Same logic applies to outputs—if they're all the same, no change separation is possible
+
+3. **Cluster Separation**
+   - Uses address clustering (CIOH - Common Input Ownership Heuristic) to identify whether inputs/outputs belong to different entities
+   - Addresses clustered together suggest common ownership
+   - PayJoin by definition involves inputs from different clusters (sender cluster vs. receiver cluster)
+   - Note: This heuristic ironically trusts CIOH, which PayJoin is designed to break
+
+4. **Round Fee Rate**
+   - Per BIP 78, most wallets create round fee rates for consistency and predictability
+   - PayJoin follows this pattern to avoid standing out—after adding receiver input, it adjusts the fee to maintain roundness
+   - Non-round fee rates suggest single-wallet behavior
+
+5. **Non-Round Outputs**
+   - In normal transactions: if payment is round, change becomes non-round (one round, one non-round output)
+   - In PayJoin: output = Sender Input + Receiver Input - Payment - Fee. Since inputs are non-round and independent, the result is almost always non-round
+   - Getting two round outputs requires both receiver input AND payment to be round (rare coincidence)
+
+6. **Mixed Input Types**
+   - Pre-September 2024: BIP 78 prohibited mixed input types; homogeneous types were mandatory
+   - Mixed types before this date are a strong signal against PayJoin
+   - Post-September 2024: BIP 78 was updated to allow mixed types, enabling cooperation between different wallet versions
+
+7. **CoinJoin Pattern Detection**
+   - PayJoin's goal is anonymity without being obviously a privacy protocol
+   - CoinJoins are flagged by blockchain analysts and have inputs/outputs removed from clustering
+   - A transaction that looks like a CoinJoin (5+ inputs, 5+ outputs, many duplicate amounts) is avoided by PayJoin implementations
+   - This heuristic excludes obvious CoinJoins from PayJoin scoring
+
+8. **Unnecessary Input Heuristic - UIH2**
+   - UIH1 (Optimal Change): The smallest output is smaller than the smallest input—suggests change detection
+   - UIH2: The smallest output is LARGER than the smallest input—unexpected, suggests two independent wallets
+   - When UIH2 is broken, it means even without the smallest input, the smallest output could still be paid
+   - Receiver typically contributes a small input; if that's smaller than any output, it's a PayJoin signal
+   - Some receiver implementations check for UIH1 and try to select appropriate inputs; others don't, creating this pattern
+
+9. **Address Reuse**
+   - Normal wallet best practice: use a new address for each transaction
+   - Reused addresses are poor privacy hygiene and uncommon in modern wallets
+   - Slight negative score if address reuse is detected (weak PayJoin signal, but possible with careless wallets)
+
+10. **Round Payment Assignment**
+    - Analyzes each input/output pair to check if `output_value - input_value` is round
+    - For 2-input/2-output transactions, hidden round payments can reveal sender intent
+    - If one assignment produces a round payment and the other doesn't, the round one is likely the actual payment
+    - Suggests structured wallet behavior vs. the randomness of adding an arbitrary receiver input
+
+11. **Signature Asymmetry**
+    - Some wallets grind ECDSA signatures to a specific length (71 bytes = low R value)
+    - Others don't grind and produce either 71 (low R) or 72 (high R) bytes randomly (~50/50)
+    - A transaction with both low-R and high-R signatures could indicate multiple wallets, each with different signature strategies
+
+12. **nSequence Asymmetry**
+    - Most wallets set the same sequence value for all their inputs (no reason to vary it)
+    - Receiver PayJoin implementations typically either enforce matching sequence values or fail
+    - Different sequence values across inputs suggest multiple independent wallets

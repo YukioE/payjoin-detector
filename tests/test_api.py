@@ -2,7 +2,7 @@ import unittest
 
 from payjoin_detector.api import analyse_txid, analyse_block
 from payjoin_detector.core.provider import TransactionNotFoundError, ProviderError
-from payjoin_detector.providers.esplora_provider import EsploraProvider
+from payjoin_detector.providers.electrs_provider import ElectrsProvider
 from tests import API
 
 COINBASE_TX = "b3d07da948174762f25cc28d9a5452350724af0e7fa96e84b735660305aac989"
@@ -15,7 +15,7 @@ BLOCK_HASH = "00000000d1145790a8694403d4063f323d499e655c83426834d4ce2f8dd4a2ee"
 
 class TestAnalyseTxid(unittest.IsolatedAsyncioTestCase):
     async def asyncSetUp(self):
-        self.provider = EsploraProvider(API, use_async=True)
+        self.provider = ElectrsProvider(API, use_async=True)
 
     async def test_returns_float(self):
         result = await analyse_txid(POTENTIAL_PAYJOIN_TX, self.provider)
@@ -42,14 +42,14 @@ class TestAnalyseTxid(unittest.IsolatedAsyncioTestCase):
             )
 
     async def test_raises_provider_error_on_bad_base_url(self):
-        provider = EsploraProvider(base_url="https://invalid.invalid/api")
+        provider = ElectrsProvider(base_url="https://invalid.invalid/api")
         with self.assertRaises(ProviderError):
             await analyse_txid(POTENTIAL_PAYJOIN_TX, provider=provider)
 
 
 class TestAnalyseBlock(unittest.IsolatedAsyncioTestCase):
     async def asyncSetUp(self):
-        self.provider = EsploraProvider(API, use_async=True)
+        self.provider = ElectrsProvider(API, use_async=True)
         self.result = await analyse_block(BLOCK_HASH, self.provider)
 
     async def test_returns_dict(self):
@@ -87,7 +87,7 @@ class TestAnalyseBlock(unittest.IsolatedAsyncioTestCase):
             )
 
     async def test_raises_provider_error_on_bad_base_url(self):
-        provider = EsploraProvider(base_url="https://invalid.invalid/api")
+        provider = ElectrsProvider(base_url="https://invalid.invalid/api")
         with self.assertRaises(ProviderError):
             await analyse_block(BLOCK_HASH, provider=provider)
 

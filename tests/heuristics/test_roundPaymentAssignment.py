@@ -3,7 +3,7 @@ import unittest
 from payjoin_detector.heuristics.roundPaymentAssignment import (
     RoundPaymentAssignmentHeuristic,
 )
-from payjoin_detector.providers.esplora_provider import EsploraProvider
+from payjoin_detector.providers.electrs_provider import ElectrsProvider
 from tests import API
 
 ROUND_PAYMENT_TX = "ca243920046b3ac028fbb4ba9e25ee3c675040e93d13180d6608a1e0e7fcc43b"
@@ -12,7 +12,7 @@ NO_ROUND_PAYMENT_TX = "8fd0b699a36de72451f4bb42aa1b127af167f15afd1dcd42bb9f454d4
 
 class TestRoundPaymentAssignmentHeuristic(unittest.IsolatedAsyncioTestCase):
     async def asyncSetUp(self):
-        provider = EsploraProvider(API)
+        provider = ElectrsProvider(API)
         self.heuristic = RoundPaymentAssignmentHeuristic()
         self.round_tx = await provider.get_transaction(ROUND_PAYMENT_TX)
         self.no_round_tx = await provider.get_transaction(NO_ROUND_PAYMENT_TX)

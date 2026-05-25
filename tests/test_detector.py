@@ -3,7 +3,7 @@ import unittest
 from payjoin_detector.detector import Detector
 from payjoin_detector.core.detection import BlockDetectionResult, TxDetectionResult
 from payjoin_detector.core.provider import TransactionNotFoundError, ProviderError
-from payjoin_detector.providers.esplora_provider import EsploraProvider
+from payjoin_detector.providers.electrs_provider import ElectrsProvider
 from tests import API
 
 COINBASE_TX = "b3d07da948174762f25cc28d9a5452350724af0e7fa96e84b735660305aac989"
@@ -17,7 +17,7 @@ BLOCK_HASH = "00000000d1145790a8694403d4063f323d499e655c83426834d4ce2f8dd4a2ee"
 
 class TestCheckPayjoinPossible(unittest.IsolatedAsyncioTestCase):
     async def asyncSetUp(self):
-        self.provider = EsploraProvider(API, use_async=True)
+        self.provider = ElectrsProvider(API, use_async=True)
         self.detector = Detector(self.provider)
 
     async def test_valid_tx_returns_true(self):
@@ -39,7 +39,7 @@ class TestCheckPayjoinPossible(unittest.IsolatedAsyncioTestCase):
 
 class TestAnalyse(unittest.IsolatedAsyncioTestCase):
     async def asyncSetUp(self):
-        self.provider = EsploraProvider(API, use_async=True)
+        self.provider = ElectrsProvider(API, use_async=True)
         self.detector = Detector(self.provider)
         self.tx = await self.provider.get_transaction(POTENTIAL_PAYJOIN_TX)
         self.result = self.detector.analyse(self.tx)
@@ -66,7 +66,7 @@ class TestAnalyse(unittest.IsolatedAsyncioTestCase):
 
 class TestDetect(unittest.IsolatedAsyncioTestCase):
     async def asyncSetUp(self):
-        self.provider = EsploraProvider(API, use_async=True)
+        self.provider = ElectrsProvider(API, use_async=True)
         self.detector = Detector(self.provider)
         self.tx = await self.provider.get_transaction(POTENTIAL_PAYJOIN_TX)
 
@@ -81,7 +81,7 @@ class TestDetect(unittest.IsolatedAsyncioTestCase):
             )
 
     async def test_propagates_provider_error(self):
-        provider = EsploraProvider("", use_async=True)
+        provider = ElectrsProvider("", use_async=True)
         detector = Detector(provider)
 
         with self.assertRaises(ProviderError):
@@ -90,7 +90,7 @@ class TestDetect(unittest.IsolatedAsyncioTestCase):
 
 class TestDetectBlock(unittest.IsolatedAsyncioTestCase):
     async def asyncSetUp(self):
-        self.provider = EsploraProvider(API, use_async=True)
+        self.provider = ElectrsProvider(API, use_async=True)
         self.detector = Detector(self.provider)
         self.result = await self.detector.detect_block(BLOCK_HASH)
 

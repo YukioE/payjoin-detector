@@ -1,6 +1,6 @@
 import unittest
 
-from payjoin_detector.providers.esplora_provider import EsploraProvider
+from payjoin_detector.providers.electrs_provider import ElectrsProvider
 from payjoin_detector.core.transaction import Transaction
 from tests import API
 from tests.providers.utils import (
@@ -17,7 +17,7 @@ from tests.providers.utils import (
 
 class TestGetTransaction(unittest.IsolatedAsyncioTestCase):
     def setUp(self):
-        self.provider = EsploraProvider(API, use_async=True)
+        self.provider = ElectrsProvider(API, use_async=True)
 
     async def test_returns_transaction(self):
         tx = await self.provider.get_transaction(SIMPLE_TX.txid)
@@ -31,7 +31,7 @@ class TestGetTransaction(unittest.IsolatedAsyncioTestCase):
 
 class TestGetTransactions(unittest.IsolatedAsyncioTestCase):
     def setUp(self):
-        self.provider = EsploraProvider(API, use_async=True)
+        self.provider = ElectrsProvider(API, use_async=True)
 
     async def test_returns_transactions(self):
         txs = await self.provider.get_block_transactions(SIMPLE_BLOCK_HASH)
@@ -54,7 +54,7 @@ class TestGetTransactions(unittest.IsolatedAsyncioTestCase):
 
 class TestFetchBlockTxIds(unittest.TestCase):
     def setUp(self):
-        self.provider = EsploraProvider(API, use_async=True)
+        self.provider = ElectrsProvider(API, use_async=True)
 
     def test_returns_txids(self):
         txid_list = self.provider._fetch_block_txids(SIMPLE_BLOCK_HASH)

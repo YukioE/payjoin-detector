@@ -4,7 +4,7 @@ Public library API for payjoin detection.
 
 from payjoin_detector.core.provider import TransactionProvider
 from payjoin_detector.detector import Detector
-from payjoin_detector.providers.esplora_provider import EsploraProvider
+from payjoin_detector.providers.electrs_provider import ElectrsProvider
 
 
 async def analyse_txid(txid: str, provider: TransactionProvider | None = None) -> float:
@@ -14,7 +14,7 @@ async def analyse_txid(txid: str, provider: TransactionProvider | None = None) -
     Args:
         txid:     The transaction ID to look up.
         provider: A TransactionProvider used to fetch the transaction.
-                  Defaults to EsploraProvider if not specified.
+                  Defaults to ElectrsProvider if not specified.
 
     Returns:
         A float in [0.0, 1.0] — higher means more likely to be a payjoin.
@@ -23,7 +23,7 @@ async def analyse_txid(txid: str, provider: TransactionProvider | None = None) -
         TransactionNotFoundError: if the txid doesn't exist.
         ProviderError:            on any other network/provider failure.
     """
-    detector = Detector(provider=provider or EsploraProvider())
+    detector = Detector(provider=provider or ElectrsProvider())
     result = await detector.detect(txid)
     return result.confidence
 
@@ -39,7 +39,7 @@ async def analyse_block(
 
     Args:
         block_hash: The block hash to analyse.
-        provider:   A TransactionProvider. Defaults to EsploraProvider.
+        provider:   A TransactionProvider. Defaults to ElectrsProvider.
         threshold:  Only return transactions at or above this confidence.
                     Defaults to 0.1. Pass 0.0 to get all transactions.
 
@@ -50,7 +50,7 @@ async def analyse_block(
         BlockNotFoundError: if the block hash doesn't exist.
         ProviderError:      on any other network/provider failure.
     """
-    detector = Detector(provider=provider or EsploraProvider())
+    detector = Detector(provider=provider or ElectrsProvider())
     block_result = await detector.detect_block(block_hash, threshold=threshold)
     return {
         r.txid: r.confidence for r in block_result.results if r.confidence >= threshold

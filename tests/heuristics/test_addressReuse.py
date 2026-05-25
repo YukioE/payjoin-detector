@@ -1,6 +1,6 @@
 import unittest
 from payjoin_detector.heuristics.addressReuse import AddressReuseHeuristic
-from payjoin_detector.providers.esplora_provider import EsploraProvider
+from payjoin_detector.providers.electrs_provider import ElectrsProvider
 from tests import API
 
 ADDRESS_REUSE_TX = "b92d778b8db32f0afc316e6b9885af97844efd547d7b049c6e9c9ffcaa87a70a"
@@ -9,7 +9,7 @@ NORMAL_TX = "f6146cbe2f7f18a62934eb338ac18762da35ad1b61aacb93eee13cb16761a1c7"
 
 class TestAddressReuseHeuristic(unittest.IsolatedAsyncioTestCase):
     async def asyncSetUp(self):
-        provider = EsploraProvider(API)
+        provider = ElectrsProvider(API)
         self.heuristic = AddressReuseHeuristic()
         self.address_reuse_tx = await provider.get_transaction(ADDRESS_REUSE_TX)
         self.normal_tx = await provider.get_transaction(NORMAL_TX)

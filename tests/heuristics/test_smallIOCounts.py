@@ -1,7 +1,7 @@
 import unittest
 
 from payjoin_detector.heuristics.smallIOCounts import SmallIOCountsHeuristic
-from payjoin_detector.providers.esplora_provider import EsploraProvider
+from payjoin_detector.providers.electrs_provider import ElectrsProvider
 from tests import API
 
 SMALL_IO_TX = "e788a31ef2f97e4d0a80ebb900834608fc99ce12d1dfb500a60ffc822ee1e546"
@@ -10,7 +10,7 @@ LARGE_IO_TX = "491937837833decfb14b106133fd53b34d87da217ff478eaecc96331f08f0cb3"
 
 class TestSmallIOCountsHeuristic(unittest.IsolatedAsyncioTestCase):
     async def asyncSetUp(self):
-        provider = EsploraProvider(API)
+        provider = ElectrsProvider(API)
         self.heuristic = SmallIOCountsHeuristic()
         self.small_io = await provider.get_transaction(SMALL_IO_TX)
         self.large_io = await provider.get_transaction(LARGE_IO_TX)

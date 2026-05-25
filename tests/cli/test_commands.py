@@ -4,7 +4,7 @@ import unittest
 import io
 from payjoin_detector.cli.commands import cmd_tx, cmd_block
 from payjoin_detector.detector import Detector
-from payjoin_detector.providers.esplora_provider import EsploraProvider
+from payjoin_detector.providers.electrs_provider import ElectrsProvider
 from tests import API
 
 
@@ -14,7 +14,7 @@ BLOCK = "00000000d1145790a8694403d4063f323d499e655c83426834d4ce2f8dd4a2ee"
 
 class TestCmdTx(unittest.IsolatedAsyncioTestCase):
     async def asyncSetUp(self):
-        self.provider = EsploraProvider(API, use_async=True)
+        self.provider = ElectrsProvider(API, use_async=True)
         self.detector = Detector(self.provider)
         self.args = SimpleNamespace(txid=TX)
 
@@ -31,7 +31,7 @@ class TestCmdTx(unittest.IsolatedAsyncioTestCase):
 
 class TestCmdBlock(unittest.IsolatedAsyncioTestCase):
     async def asyncSetUp(self):
-        self.provider = EsploraProvider(API, use_async=True)
+        self.provider = ElectrsProvider(API, use_async=True)
         self.detector = Detector(self.provider)
         self.args = SimpleNamespace(blockhash=BLOCK, use_async=False)
 

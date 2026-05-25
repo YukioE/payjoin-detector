@@ -1,5 +1,5 @@
 """
-HTTP provider for any Esplora-compatible API.
+HTTP provider for any electrs-compatible API.
 """
 
 import asyncio
@@ -28,12 +28,12 @@ BLOCKSTREAM_BASE = "https://blockstream.info/api"
 _MAX_CONCURRENT = 50
 
 
-class EsploraProvider(TransactionProvider):
+class ElectrsProvider(TransactionProvider):
     """
-    Fetches transactions from any Esplora REST API.
+    Fetches transactions from any electrs REST API.
 
     Args:
-        base_url:       Root URL of the Esplora API, no trailing slash.
+        base_url:       Root URL of the electrs API, no trailing slash.
         timeout:        HTTP request timeout in seconds.
         max_concurrent: Max parallel requests when fetching a full block.
         use_async:      If True, fetch transactions in parallel. Defaults to False.

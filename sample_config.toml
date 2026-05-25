@@ -1,20 +1,19 @@
-# default values
 [provider]
-type = "esplora" # "esplora" | "bitcoin-core"
-async = false
+type = "electrs" # "electrs" | "bitcoin-core" default: "electrs"
+async = true # default: false
 
-[esplora]
-url = "https:mempool.space/api"
+[electrs]
+url = "http://100.90.20.1:3000" # default: "https://mempool.space/api"
 
 [bitcoin_core]
-rpc_url = ""
-rpc_user = ""
-rpc_password = ""
+url = "http://127.0.0.1:8332" # default: ""
+user = "bitcoin" # default: ""
+password = "bitcoin" # default: ""
 
 [block]
-threshold = 0.1
+threshold = 0.1 # default: 0.1
 
 [output]
-csv_file = ""
-debug_file = ""
-html_file = ""
+csv_file = "results.csv" # default: ""
+debug_file = "debug.log" # default: ""
+html_file = "report.html" # default: ""

@@ -1,7 +1,7 @@
 import unittest
 
 from payjoin_detector.heuristics.clustering import ClusteringHeuristic
-from payjoin_detector.providers.esplora_provider import EsploraProvider
+from payjoin_detector.providers.electrs_provider import ElectrsProvider
 from tests import API
 
 SINGLE_CLUSTER_TX = "78c6b27fee85f315fc7efea439e734af134136b96f5a9cfa6dcf4f4a6c88aa4f"
@@ -10,7 +10,7 @@ MULTIPLE_CLUSTER_TX = "e15c78ce01caeb85ba035f65b2afbe7e8b9d035bfe999b765b68df191
 
 class TestClusteringHeuristic(unittest.IsolatedAsyncioTestCase):
     async def asyncSetUp(self):
-        provider = EsploraProvider(API, use_async=True)
+        provider = ElectrsProvider(API, use_async=True)
         self.single_cluster_tx = await provider.get_transaction(SINGLE_CLUSTER_TX)
         self.multiple_cluster_tx = await provider.get_transaction(MULTIPLE_CLUSTER_TX)
 

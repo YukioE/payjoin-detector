@@ -10,45 +10,57 @@ The project is a Python CLI app (`payjoin-detector`) that fetches Bitcoin transa
 - `src/payjoin_detector/cli/` - argument parsing, command handlers, output/debug formatting
 - `src/payjoin_detector/detector.py` - core detection pipeline and heuristic orchestration
 - `src/payjoin_detector/heuristics/` - individual heuristic implementations (one file per heuristic)
-- `src/payjoin_detector/providers/` - data source adapters (currently Esplora and Bitcoin Core)
+- `src/payjoin_detector/providers/` - data source adapters (currently electrs and Bitcoin Core)
 - `src/payjoin_detector/core/` - shared domain models and interfaces (transactions, provider API, results)
 - `tests/`
 
 ## Installation
 
+### Windows
+
 ```bash
 git clone https://github.com/YukioE/payjoin-detector.git
 cd payjoin-detector
+python -m venv .venv
+.venv\Scripts\activate
 python -m pip install .
 ```
 
-> Optional: editable install for development
->
-> ```bash
-> python -m venv .venv
-> .venv\Scripts\activate
-> python -m pip install -e .
-> ```
+### Linux / macOS
+
+```bash
+git clone https://github.com/YukioE/payjoin-detector.git
+cd payjoin-detector
+python3 -m venv .venv
+source .venv/bin/activate
+python3 -m pip install .
+```
+
+> Optional: use `python -m pip install -e .` for an editable development install
+
+After installation, the `payjoin-detector` command will be available while the virtual environment (`.venv`) is active, to deactivate run `deactivate`.
 
 ## Configuration
 
-Create a `.toml` file and use it with `--config <file>`. CLI flags override config values.
-
 **Recommended setup**: run your own Bitcoin Core node and point the detector at a local [electrs API](https://github.com/Blockstream/electrs) instance. This avoids API rate limits and is the most reliable option for block and neighbour analysis. For the detection of single txs using public mempool or blockstream APIs is sufficient.
+
+Create a `.toml` file and use it in addition to a subcommand (`payjoin-detector tx <txid> --config <file>`.
+
+an example configuration is available under [sample_config.toml](./sample_config.toml)
 
 ```toml
 # default values
 [provider]
-type = "esplora" # "esplora" | "bitcoin-core"
+type = "electrs" # "electrs" | "bitcoin-core"
 async = false
 
-[esplora]
+[electrs]
 url = "https://mempool.space/api"
 
 [bitcoin_core]
-rpc_url = ""
-rpc_user = ""
-rpc_password = ""
+url = ""
+user = ""
+password = ""
 
 [block]
 threshold = 0.1
@@ -59,7 +71,33 @@ debug_file = ""
 html_file = ""
 ```
 
----
+CLI flags override values specified inside the config file.
+
+example: `payjoin-detector tx <txid> --config <file> --csv_file output.csv`
+
+> List of CLI flags:
+>
+> --config \<file>
+>
+> --provider \<provider> (either electrs or bitcoin-core)
+>
+> --electrs-url \<url>
+>
+> --rpc-url \<url>
+>
+> --rpc-user \<user>
+>
+> --rpc-password \<password>
+>
+> --async
+>
+> --threshold <0.0-1.0>
+>
+> --csv-output <file.csv>
+>
+> --debug-output <file.log>
+>
+> --html-output <file.html>
 
 ## Usage
 

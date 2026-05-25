@@ -1,7 +1,7 @@
 import unittest
 
 from payjoin_detector.heuristics.mixedInputTypes import MixedInputTypesHeuristic
-from payjoin_detector.providers.esplora_provider import EsploraProvider
+from payjoin_detector.providers.electrs_provider import ElectrsProvider
 from tests import API
 
 MIXED_INPUTS_BEFORE_SEP2024_TX = (
@@ -15,7 +15,7 @@ UNIFORM_INPUTS_TX = "bd5534d47ed18456f2d4966408cf9009ade5733d5ee729732f4816bb96c
 
 class TestMixedInputTypesHeuristic(unittest.IsolatedAsyncioTestCase):
     async def asyncSetUp(self):
-        provider = EsploraProvider(API)
+        provider = ElectrsProvider(API)
         self.heuristic = MixedInputTypesHeuristic()
         self.mixed_before = await provider.get_transaction(
             MIXED_INPUTS_BEFORE_SEP2024_TX

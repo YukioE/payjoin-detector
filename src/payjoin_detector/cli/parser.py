@@ -4,7 +4,7 @@ import tomllib
 from pathlib import Path
 from payjoin_detector.core import provider
 from payjoin_detector.providers.btcCore_provider import BitcoinCoreProvider
-from payjoin_detector.providers.esplora_provider import EsploraProvider
+from payjoin_detector.providers.electrs_provider import ElectrsProvider
 
 
 def _load_config(path: str | None) -> dict:
@@ -25,7 +25,7 @@ def _apply_config(args: argparse.Namespace, cfg: dict) -> None:
     CLI values have priority, config is only used when the arg is still None / its default.
     """
     prov = cfg.get("provider", {})
-    esplora = cfg.get("esplora", {})
+    electrs = cfg.get("electrs", {})
     core = cfg.get("bitcoin_core", {})
     block = cfg.get("block", {})
     output = cfg.get("output", {})
@@ -46,24 +46,24 @@ def _apply_config(args: argparse.Namespace, cfg: dict) -> None:
         args.html_output = output["html_file"]
 
     # provider type
-    if args.provider == "esplora" and "type" in prov:
+    if args.provider == "electrs" and "type" in prov:
         args.provider = prov["type"]
 
     # async
     if not args.use_async and "async" in prov:
         args.use_async = prov["async"]
 
-    # esplora
-    if args.esplora_url is None and "url" in esplora:
-        args.esplora_url = esplora["url"]
+    # electrs
+    if args.electrs_url is None and "url" in electrs:
+        args.electrs_url = electrs["url"]
 
     # bitcoin-core
-    if args.rpc_url is None and "rpc_url" in core:
-        args.rpc_url = core["rpc_url"]
-    if args.rpc_user is None and "rpc_user" in core:
-        args.rpc_user = core["rpc_user"]
-    if args.rpc_password is None and "rpc_password" in core:
-        args.rpc_password = core["rpc_password"]
+    if args.rpc_url is None and "url" in core:
+        args.rpc_url = core["url"]
+    if args.rpc_user is None and "user" in core:
+        args.rpc_user = core["user"]
+    if args.rpc_password is None and "password" in core:
+        args.rpc_password = core["password"]
 
     # block-specific
     if hasattr(args, "threshold") and args.threshold == 0.1 and "threshold" in block:
@@ -73,8 +73,8 @@ def _apply_config(args: argparse.Namespace, cfg: dict) -> None:
 def _add_provider_args(p: argparse.ArgumentParser) -> None:
     p.add_argument(
         "--provider",
-        choices=["esplora", "bitcoin-core"],
-        default="esplora",
+        choices=["electrs", "bitcoin-core"],
+        default="electrs",
     )
     p.add_argument(
         "--config",
@@ -101,9 +101,9 @@ def _add_provider_args(p: argparse.ArgumentParser) -> None:
         help="Write debug logs to this file",
     )
 
-    esplora_group = p.add_argument_group("Esplora options")
-    esplora_group.add_argument(
-        "--esplora-url", default=None, help="Base URL — e.g. https://mempool.space/api"
+    electrs_group = p.add_argument_group("Electrs options")
+    electrs_group.add_argument(
+        "--electrs-url", default=None, help="Base URL — e.g. https://mempool.space/api"
     )
 
     core_group = p.add_argument_group("Bitcoin Core options")
@@ -173,6 +173,6 @@ def get_provider(args: argparse.Namespace) -> provider.TransactionProvider:
             use_async=use_async,
         )
 
-    if args.esplora_url:
-        return EsploraProvider(args.esplora_url, use_async=use_async)
-    return EsploraProvider(use_async=use_async)
+    if args.electrs_url:
+        return ElectrsProvider(args.electrs_url, use_async=use_async)
+    return ElectrsProvider(use_async=use_async)

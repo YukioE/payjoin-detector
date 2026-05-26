@@ -1,10 +1,14 @@
 import argparse
 import sys
-import tomllib
 from pathlib import Path
 from payjoin_detector.core import provider
 from payjoin_detector.providers.btcCore_provider import BitcoinCoreProvider
 from payjoin_detector.providers.electrs_provider import ElectrsProvider
+
+try:
+    import tomllib  # Python 3.11+
+except ModuleNotFoundError:
+    import tomli as tomllib
 
 
 def _load_config(path: str | None) -> dict:

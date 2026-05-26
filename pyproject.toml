@@ -3,6 +3,10 @@ name = "payjoin-detector"
 version = "0.1.0"
 description = "Heuristic PayJoin detector for Bitcoin transactions"
 readme = "README.md"
+dependencies = [
+    'tomli; python_version < "3.11"',
+]
+requires-python = ">=3.8"
 
 [project.scripts]
 payjoin-detector = "payjoin_detector.main:main"

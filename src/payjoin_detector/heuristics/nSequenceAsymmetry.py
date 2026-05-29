@@ -27,7 +27,7 @@ class NSequenceAsymmetryHeuristic(Heuristic):
             values_str = ", ".join(hex(v) for v in sorted(seq_values))
             return HeuristicResult(
                 name=self.name,
-                score=2.0,
+                score=-2.0,
                 signal=f"asymmetric nSequence values detected - {seq_values}",
                 html_signal=f"{{{values_str}}}",
             )

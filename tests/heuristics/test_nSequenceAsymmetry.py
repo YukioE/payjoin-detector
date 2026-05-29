@@ -19,7 +19,7 @@ class TestNSequenceAsymmetryHeuristic(unittest.IsolatedAsyncioTestCase):
 
     def test_asymmetric_score(self):
         result = self.heuristic.check(self.asymmetric_tx)
-        self.assertGreater(result.score, 0.0)
+        self.assertLess(result.score, 0.0)
 
     def test_uniform_score_is_neutral(self):
         result = self.heuristic.check(self.uniform_tx)
